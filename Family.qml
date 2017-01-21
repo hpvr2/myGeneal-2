@@ -6,19 +6,18 @@ Item {                                  // Definition of a family object
     property int husband : 0            //todo : use object directly
     property int wife : 0               //todo : use object directly
 
-    property string marriagedate: ""
-    property int    marriageyear  : 0    //todo : extract year
-    property string marriageplace  : ""
+    property string marriageDate: ""
+    property string marriagePlace  : ""
 
-    property string divorcedate  : ""
-    property string divorceplace  : ""
+    property string divorceDate  : ""
+    property string divorcePlace  : ""
 
     property var     children     : []   //todo : use object directly
 
     property string note  : ""
 
     function prt(){
-        console.log(pid + " " + husband+  " " + wife + " " + marriagedate + " Childs " + children)
+        console.log(pid + " " + husband+  " " + wife + " " + marriageDate + marriagePlace +" Childs " + children)
     }
 
 
