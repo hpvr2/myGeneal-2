@@ -56,6 +56,7 @@ Item {
     property alias textFieldSelectFrom: textFieldSelectFrom
     property alias textFieldSelectName: textFieldSelectName
     property alias textSelection: textSelection
+    height: 200
     z: 2147483646
 
 

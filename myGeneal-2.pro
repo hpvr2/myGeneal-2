@@ -45,4 +45,6 @@ DISTFILES += \
     ../../QML-Geneal/myGeneal-2/Data/f-autosave.csv \
     ../../QML-Geneal/myGeneal-2/Data/p-autosave.csv \
     ../../QML-Geneal/myGeneal-2/Data/myGeneal.ini \
-    ../../QML-Geneal/myGeneal-2/Data/all-out.ged
+    ../../QML-Geneal/myGeneal-2/Data/all-out.ged \
+    ../../QML-Geneal/myGeneal-2/Data/All.ged \
+    ../../QML-Geneal/myGeneal-2/Data/all-test.ged

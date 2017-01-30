@@ -24,7 +24,7 @@ Item {                                          // Definition of a person object
 
     property string note  : ""
 
-    property var childOfFamily : 0                  //todo : use object directly
+    property int childOfFamily : 0                  //todo : use object directly
     property var parentInFamily : []               //todo : use object directly
 
 
