@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 GenealFile::GenealFile(QObject *parent)
     : QObject(parent)
@@ -18,7 +19,8 @@ QString GenealFile::readFile(const QUrl &fileUrl) const
         qFatal("Failed to read %s", qPrintable(fileUrl.toLocalFile()));
     QTextStream stream(&file);
     stream.setAutoDetectUnicode(true);
-    stream >> out;
+    out = stream.readAll();
+//    qDebug() << "Read:" << out;
     file.close();
     return out;
 }

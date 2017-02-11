@@ -2,7 +2,7 @@
 function select(gender,name,from , to){      // selection list ( filtered ) for persons
 
     print("Selection called : "+ gender +" "+ name + " "+ from+" "+ to   )
-
+    rectSelect.visible = true
     name = name.toLowerCase()
     if ( from === "    ") from = 0
     var p1
@@ -28,15 +28,48 @@ function select(gender,name,from , to){      // selection list ( filtered ) for 
     return
 }
 // #########################################################
+function splitPNote(note){
+    var nl = "\n"
+    while (note.length >  0 ) {
+        var x = note.indexOf(nl)
+        if ( x === -1 ) x = note.length
+        if ( x < 80 ) { // use variable line length
+            textEditPnote.append(note.substr(0,x))
+            note = note.substr(x+1)
+        }
+        else {
+            x = note.substr(0,80).lastIndexOf(" ")
+            textEditPnote.append(note.substr(0,x))
+            note = note.substr(x+1)
+        }
+    }
+}
+function splitFNote(note){
+    var nl = "\n"
+    while (note.length >  0 ) {
+        var x = note.indexOf(nl)
+        if ( x === -1 ) x = note.length
+        if ( x < 80 ) { // use variable line length
+            textEditFnote.append(note.substr(0,x))
+            note = note.substr(x+1)
+        }
+        else {
+            x = note.substr(0,80).lastIndexOf(" ")
+            textEditFnote.append(note.substr(0,x))
+            note = note.substr(x+1)
+        }
+    }
+}
 function setRelatives(actualId){             // set person and family data in screen
 
     var blank = "                               "
     var parentFamily
+    var partnerFamily
     var p1
     var person = persons[actualId]
-     person.prt()
+    person.prt()
 
-//### display person related data
+    //### display person related data
     labelPid.text = "Person Id : " +    person.pid
 
     rectangleGender.color=   ( person.gender === "M") ? "cyan" : "pink"
@@ -49,14 +82,15 @@ function setRelatives(actualId){             // set person and family data in sc
     textFieldDeathPlace.text= person.deathPlace
     textFieldOccupation.text= person.occupation
 
-    textEditPnote.text      = person.note
+    textEditPnote.clear()
+    splitPNote(person.note)
 
-//### display parent related data
+    //### display parent related data
     parents.clear()
-    person.prt()
+    //    person.prt()
     if (person.childOfFamily !== 0){
         parentFamily = families[familyIndex.indexOf(person.childOfFamily)]
-        parentFamily.prt()
+        //        parentFamily.prt()
         p1 = persons[personIndex.indexOf(parentFamily.husband)]
         parents.append({ "pid": p1.pid,
                            "givenName": p1.givenName.concat(blank).substr(0,30),
@@ -70,36 +104,56 @@ function setRelatives(actualId){             // set person and family data in sc
                            "bYear" : p1.birthYear,
                            "dYear" :p1.deathYear})
     }
-//### display family related data
+    //### display family related data
     partners.clear()
     childs.clear()
+    if ( actualFam >= person.parentInFamily.length) actualFam = 0
 
     for (var i=0 ; i< person.parentInFamily.length ; i++){
         var xx = parseInt(person.parentInFamily[i])
-        if (xx !== 0){
+        print("xx "+xx)
+        if ( isNaN(xx)) break                                       // TODO : check why, only occurs in readCSV
+
+
+
+        if (xx !== 0 && xx  !== ""){
+
             partnerFamily              = families[familyIndex.indexOf(xx)]
-            textFieldMarryDate.text    = partnerFamily.marriageDate
-            textFieldMarryPlace.text   = partnerFamily.marriagePlace
-            textFieldDivorceDate.text  = partnerFamily.divorceDate
-            textFieldDivorcePlace.text = partnerFamily.divorcePlace
+            partnerFamily.prt()
 
             if (person.gender === "F"){ p1 = persons[personIndex.indexOf(partnerFamily.husband)]}
             else {                      p1 = persons[personIndex.indexOf(partnerFamily.wife   )]}
+
+            print( familyIndex.indexOf(xx))
+                        p1.prt()
             partners.append({"pid"      : p1.pid,
-                             "givenName": p1.givenName.concat(blank).substr(0,30),
-                             "surName"  : p1.surName.concat(blank).substr(0,30),
-                             "bYear"    : p1.birthYear,
-                             "dYear"    : p1.deathYear})
+                                "givenName": p1.givenName.concat(blank).substr(0,30),
+                                "surName"  : p1.surName.concat(blank).substr(0,30),
+                                "bYear"    : p1.birthYear,
+                                "dYear"    : p1.deathYear})
+
+            if ( actualFam === i) {
+                print("actual "+ actualFam+ " " + i+ " "+ partnerFamily.children.length)
+                textFieldMarryDate.text    = partnerFamily.marriageDate
+                textFieldMarryPlace.text   = partnerFamily.marriagePlace
+                textFieldDivorceDate.text  = partnerFamily.divorceDate
+                textFieldDivorcePlace.text = partnerFamily.divorcePlace
+
+                for ( var j=0 ; j< partnerFamily.children.length ; j++){
+                    p1 = persons[personIndex.indexOf(parseInt(partnerFamily.children[j]))]
+                    p1.prt()
+                    childs.append({   "pid"       : p1.pid,
+                                      "givenName" : p1.givenName.concat(blank).substr(0,30),
+                                      "surName"   : p1.surName.concat(blank).substr(0,30),
+                                      "bYear"     : p1.birthYear,
+                                      "dYear"     : p1.deathYear})
+                }
+            }
         }                                                //todo : support for multiple families
 
-        for ( i=0 ; i< partnerFamily.children.length ; i++){
-            p1 = persons[personIndex.indexOf(parseInt(partnerFamily.children[i]))]
-            childs.append({   "pid"       : p1.pid,
-                              "givenName" : p1.givenName.concat(blank).substr(0,30),
-                              "surName"   : p1.surName.concat(blank).substr(0,30),
-                              "bYear"     : p1.birthYear,
-                              "dYear"     : p1.deathYear})
-        }
+
+        textEditFnote.clear()
+        splitFNote(partnerFamily.note)
     }
 }
 function saveScreen(){

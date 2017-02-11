@@ -14,6 +14,7 @@ import "ExternalData.js" as External
 
 Page1Form {
     property int actualId : 0
+    property int  actualFam : 0
 
     property int startIndi :0
     property int startFam : 0
@@ -35,7 +36,22 @@ Page1Form {
     property string selectGender: ""
     property string selectName : ""
     property int selectFrom: 0      //todo variable year
-    property int selectTo : 2017 // todo variable year
+    property int selectTo : 2017   // todo variable year
+
+    buttonNextFamily.onClicked: {
+        actualFam = actualFam + 1
+  //      if ( actualFam > person.parentInFamily.length ) actualFam = 0
+        EditPage.setRelatives(actualId)
+
+}
+
+     anchors.fill: parent
+
+    buttonHide.onClicked: {
+        rectOptions.visible = false
+}
+
+
     textEditHeader.onTextChanged: {
 
         for ( var i = 1; i< textEditHeader.length; i++){
@@ -44,24 +60,16 @@ Page1Form {
             print(header[i])
 }
 
-    buttonEditHeader.onClicked: {
-        print(header + "  "+ header.length)
-        for ( var i = 0; i< header.length; i++){
-            print("line "+i + " " +header[i])
-            textEditHeader.append(String(header[i]))
-        }
-}
+
     buttonSave.onClicked: {
         EditPage.saveScreen(person)
 }
 
     buttonReadCSV.onClicked: {
         rectOptions.visible = false
-        print("before calling")
-        persons = External.readCSV_P()
-        print(persons)
-        families = External.readCSV_F()
-        print(families)}
+        External.readCSV_P()
+        External.readCSV_F()
+    }
 //#################################### selection control
     radioButtonFemale.onClicked: {
         radioButtonMale.checked=false
@@ -87,6 +95,7 @@ Page1Form {
         EditPage.select(selectGender,selectName,selectFrom,selectTo)}
 
     buttonSelectOther.onClicked: {
+        rectSelect.visible = true
         if (rectSelect.visible) {EditPage.select(selectGender,selectName,selectFrom,selectTo) }
         else{rectSelect.visible = true}
 
@@ -95,22 +104,27 @@ Page1Form {
     mouseAreaChilds.onClicked: {
         var p1 = childs.get(listViewChilds.indexAt(mouseAreaChilds.mouseX,mouseAreaChilds.mouseY))
         actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
         EditPage.setRelatives(actualId)
     }
     mouseAreaPartners.onClicked: {
         var p1 = partners.get(listViewPartners.indexAt(mouseAreaPartners.mouseX,mouseAreaPartners.mouseY))
         actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
         EditPage.setRelatives(actualId)
     }
     mouseAreaParents.onClicked: {
         var p1 = parents.get(listViewParents.indexAt(mouseAreaParents.mouseX,mouseAreaParents.mouseY))
         actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
         EditPage.setRelatives(actualId)
     }
     mouseAreaSelect.onClicked: {
         var p1 = selection.get(listViewSelect.indexAt(mouseAreaSelect.mouseX,mouseAreaSelect.mouseY))
         actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
         EditPage.setRelatives(actualId)
+
         rectSelect.visible= false
     }
 
@@ -137,20 +151,26 @@ Page1Form {
             console.log(genealFile.fileExists(fileid) + fileid)
 
             var text = genealFile.readFile(fileid);          // read file and split into lines
-            var a = text.split("\r\n");
+            var a = text.split("\n");
 
             header.length = 0
             Gedcom.parseHEADER(a)                               // parse Header data
-            for ( var i = 0 ; i<header.length; i++) print(header[i])
+//            for ( var i = 0 ; i<header.length; i++) print(header[i])
 
             persons.length = 0
             personIndex.length = 0
-            Gedcom.parseINDI(a)                                 // parse INDI data
+            Gedcom.parseINDI(a)              // parse INDI data
+//            print("INDI List ####################################")
 //            for ( i = 0 ; i<persons.length; i++) print(persons[i].pid + " " +persons[i].givenName + " " + persons[i].surName)
 
             families.length = 0
             familyIndex.length = 0
             Gedcom.parseFAM(a)                                      // parse FAM data
+
+            trailer.length = 0
+            Gedcom.parseTRAILER(a)                               // parse Header data
+//            for ( var i = 0 ; i<trailer.length; i++) print(trailer[i])
+
 //            for ( i = 0 ; i<families.length; i++) print(families[i].pid + " " +families[i].marriageDate + " " + families[i].marriagePlace)
 
                                                                     // parse trailor  data   TODO
@@ -170,18 +190,18 @@ Page1Form {
         rectOptions.visible = false
     }
 
-    buttonNextFamily.onClicked: {     }
+    //buttonNextFamily.onClicked: {     }
 
 
     buttonNextId.onClicked: {                   // switch to next pid
-        print("button next "+actualId)
+//        print("button next "+actualId)
         actualId : actualId++
+        actualFam = 0
         EditPage.setRelatives(actualId)
     }
 
 
     buttonWriteGedcom.onClicked : {
-
         Gedcom.writeGedcom()}
 }
 

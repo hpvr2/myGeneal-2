@@ -3,17 +3,48 @@
 //#####################################################
 function parseHEADER(a){                                // Extract HEADER data from GEDCOM array "a"
 
+    textEditHeader.clear()
+    var text = ""
     for (var i = 0; i < a.length; i++) {                // first loop : store header
-        var line =a[i]
+        var line =a[i].trim()
         var token = line.split(" ");
 
         if ( token[2] === "INDI"){                              // first person Record found
-            console.log("start of INDI Part found in line "+i +": "+ line);
+//            console.log("start of INDI Part found in line "+i +": "+ line);
             startIndi = i
             break                                           // stop this loop
         }
-        else {header.push(line) }
+        else {header.push("\n" + line )
+            textEditHeader.append(line)
+            text = text + line + "\n"
+        }
     }
+
+    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/header-data.ged"
+    console.log(genealFile.fileExists(fileid))
+
+    var x = genealFile.writeFile(fileid,text)
+    return
+}
+//################################
+function parseTRAILER(a){                                // Extract Trailer data from GEDCOM array "a"
+
+    textEditTrailer.clear()
+    var text = ""
+    for (var i = startTrailer; i < a.length; i++) {                // first loop : store trailer
+        var line =a[i].trim()
+        var token = line.split(" ");
+
+       trailer.push("\n" + line )
+       textEditTrailer.append(line)
+       text = text + line + "\n"
+
+    }
+
+    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/trailer-data.ged"
+    console.log(genealFile.fileExists(fileid))
+
+    var x = genealFile.writeFile(fileid,text)
     return
 }
 //#######################################################
@@ -28,16 +59,16 @@ function parseINDI(a){                                // Extract Person data fro
     var tempYear = ""
     var line
     var token = []
-
+//    print("parseINDI " + startIndi)
     for ( var i1 = startIndi ; i1< a.length; i1++)  {     //  Read person Records
 
-        line =a[i1]
+        line =a[i1].trim()
         token = line.split(" ");
 
         if (token[2] === "FAM" ) {                  // all person data read
-            console.log ("start of FAMILY part , line : "+ i1 +": "+ line)
+//            console.log ("start of FAMILY part , line : "+ i1 +": "+ line)
             startFam = i1
-
+             // cleanup person note : splitNote(person.note)
             persons.push(person)            // store last person
             personIndex.push(person.pid)
             break
@@ -46,6 +77,7 @@ function parseINDI(a){                                // Extract Person data fro
             switch ( token[2] ){
             case "INDI" :{                              // next person Record found
                 var xx = token[1].match(/\d+/g)[0]      // temp person.pid
+                // cleanup person note
                 persons.push(person)                    // store last person
                 personIndex.push(person.pid)
 
@@ -112,12 +144,12 @@ function parseINDI(a){                                // Extract Person data fro
             }
         }
     }
-    //    print("end of parseINDI")
+//    print("end of parseINDI")
     return
 }
 //##############################################################################
 function parseFAM(a){                                   // Extract family data from GEDCOM array "a"
-    //    print("start of parseFAM")
+//     print("start of parseFAM")
 
     var creatorF = Qt.createComponent("Family.qml")   // define factory for family
     var family = creatorF.createObject(appWindow)     // actual family
@@ -126,17 +158,17 @@ function parseFAM(a){                                   // Extract family data f
     var dateFlag = "none"
     var nl ="\n"
 
-
+//    print("startFam "+startFam)
     // ****************************************************************************************
     for ( var i1 = startFam ; i< a.length; i1++)  {     // third loop ; Read FAM Records
 
-        var line =a[i1]
+        var line =a[i1].trim()
         var token = line.split(" ");
 
-        if ( token[1] === "TRLR" || token[1] === "SOUR" ){   //end of FAM part
+        if ( token[1] === "TRLR" || token[2] === "SOUR" ){   //end of FAM part
             families.push(family)            // store last family
             familyIndex.push(family.pid)
-            console.log ("Trailor part to be written, line : "+ i1)  //todo: store data for later use
+            startTrailer = i1
 
             break
         }
@@ -221,98 +253,99 @@ function writeNote(note){                                       // write a note 
     }
     return text
 }
+
 //#######################################
 function writeGedcom(){
 
     var path = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/testOutput.ged"
-    var i = 0
-    var text
-    var nl = "\n"
+                          var i = 0
+                          var text
+                          var nl = "\n"
 
-    text = "0 HEAD" + nl                                           // TODO : replace with stored text
-    text = text +"1 SOUR myGeneal" + nl
-    text = text +"2 VERS 0.1" + nl
-    text = text +"0 @U1@ SUBM" + nl
-    text = text +"1 NAME Hans-Peter von Reth" + nl
-    text = text +"0 @SUBM@ SUBM" + nl
-    text = text +"1 NAME Hans-Peter von Reth" + nl
-    //    ######################
-    for (var i1 in persons){                                    // write INDI part
-        person = persons[i1]
-        //     person.prt()
-        if (person.pid != 0){
-            text = text +"0 @I" + person.pid + "@ INDI" + nl
-            text = text +"1 NAME " +person.givenName + "/" + person.surName + "/" + nl
-            text = text +"2 GIVN " + person.givenName + nl
-            text = text +"2 SURN " + person.surName + nl
-            text = text +"1 SEX " + person.gender + nl
-            if (person.birthDate != "" ){
-                text = text +"1 BIRT" + nl
-                text = text +"2 DATE " + person.birthDate + nl
-                if (person.birthPlace != "" ){ text = text +"2 PLAC "+person.birthPlace + nl}
-            }
-            if ( person.christianDate != "" ){ text = text +"1 CHR" + nl
-                text = text +"2 DATE "+person.christianDate + nl
-                if (person.christianPlace != "" ){ text = text +"2 PLAC "+person.christianPlace + nl }
-            }
-            if (person.deathDate != "" ){
-                text = text +"1 DEAT" + nl
-                text = text +"2 DATE " + person.deathDate  +nl
-                if ( person.deathPlace != "" ){ text = text +"2 PLAC " + person.deathPlace + nl}
-            }
-            for ( var i2 in person.parentInFamily){
-                if (i2  !== 0){ text = text +"1 FAMS @F" + person.parentInFamily[i2] + "@" + nl}
-            }
-            if (person.childOfFamily != 0){
-                text = text +"1 FAMC @F" + person.childOfFamily + "@" + nl
-            }
-            if ( person.occupation != "" ){ text = text +"1 OCCU " + person.occupation + nl
-            }
-            if ( person.note !== "" ){  text = text + writeNote(String(person.note).trim()) }
-        }
-        //    ######################
+                          text = "0 HEAD" + nl                                           // TODO : replace with stored text
+                          text = text +"1 SOUR myGeneal" + nl
+                          text = text +"2 VERS 0.1" + nl
+                          text = text +"0 @U1@ SUBM" + nl
+                          text = text +"1 NAME Hans-Peter von Reth" + nl
+                          text = text +"0 @SUBM@ SUBM" + nl
+                          text = text +"1 NAME Hans-Peter von Reth" + nl
+                          //    ######################
+                          for (var i1 in persons){                                    // write INDI part
+                              person = persons[i1]
+                              //     person.prt()
+                              if (person.pid != 0){
+                                  text = text +"0 @I" + person.pid + "@ INDI" + nl
+                                  text = text +"1 NAME " +person.givenName + "/" + person.surName + "/" + nl
+                                  text = text +"2 GIVN " + person.givenName + nl
+                                  text = text +"2 SURN " + person.surName + nl
+                                  text = text +"1 SEX " + person.gender + nl
+                                  if (person.birthDate != "" ){
+                                      text = text +"1 BIRT" + nl
+                                      text = text +"2 DATE " + person.birthDate + nl
+                                      if (person.birthPlace != "" ){ text = text +"2 PLAC "+person.birthPlace + nl}
+                                  }
+                                  if ( person.christianDate != "" ){ text = text +"1 CHR" + nl
+                                      text = text +"2 DATE "+person.christianDate + nl
+                                      if (person.christianPlace != "" ){ text = text +"2 PLAC "+person.christianPlace + nl }
+                                  }
+                                  if (person.deathDate != "" ){
+                                      text = text +"1 DEAT" + nl
+                                      text = text +"2 DATE " + person.deathDate  +nl
+                                      if ( person.deathPlace != "" ){ text = text +"2 PLAC " + person.deathPlace + nl}
+                                  }
+                                  for ( var i2 in person.parentInFamily){
+                                      if (i2  !== 0){ text = text +"1 FAMS @F" + person.parentInFamily[i2] + "@" + nl}
+                                  }
+                                  if (person.childOfFamily != 0){
+                                      text = text +"1 FAMC @F" + person.childOfFamily + "@" + nl
+                                  }
+                                  if ( person.occupation != "" ){ text = text +"1 OCCU " + person.occupation + nl
+                                  }
+                                  if ( person.note !== "" ){  text = text + writeNote(String(person.note).trim()) }
+                              }
+                              //    ######################
 
-    }
-    //    ######################
-    for ( i1 in families){                                      // write FAM part
-        var family = families[i1]
-        if ( family.pid     !== 0){ text = text + "0 @F" + family.pid + "@ FAM" + nl     }
-        if (family.husband !== 0 ){ text = text + "1 HUSB @I" + family.husband + "@" + nl }
-        if (family.wife    !== 0 ){ text = text + "1 WIFE @I" + family.wife    + "@" + nl }
-        if (family.marriageDate !== "" ){
-            text = text + "1 MARR" + nl
-            if (family.marriageDate  !== "" ){ text = text + "2 DATE " + family.marriageDate  + nl }
-            if (family.marriagePlace !== "" ){ text = text + "2 PLAC " + family.marriagePlace  + nl }
-        }
-        if (family.divorceDate !== "" ){
-            text = text + "1 DIV" + nl
-            if (family.divorceDate  !== "" ){ text = text + "2 DATE " + family.divorceDate  + nl }
-            if (family.divorcePlace !== "" ){ text = text + "2 PLAC " + family.divorcePlace  + nl }
-        }
-        for (  i2 in family.children){
-            if (i2  !== 0){ text = text +"1 CHIL @I" + family.children[i2] + "@" + nl}
-        }
-        if ( family.note !== "" ){  text = text + writeNote(String(family.note).trim()) }
-    }
-    //    ######################
-    text = text + '0 @S4@ SOUR\n'                               // TODO : replace with stored text
-    text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
-    text = text + '0 @S6@ SOUR\n'
-    text = text + '1 TITL Euregio\n'
-    text = text + '1 REPO @R1@\n'
-    text = text + '0 @S20@ SOUR\n'
-    text = text + '1 TITL (see notes)\n'
-    text = text + '0 @S37@ SOUR\n'
-    text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
-    text = text + '0 @R1@ REPO\n'
-    text = text + '1 NAME Euregio Familienbuch\n'
-    text = text + '0 TRLR\n'
-    // print(text)                                                // store test file
-    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/all-test.ged"
-    // print(fileid)
-    console.log(genealFile.fileExists(fileid))
+                          }
+                          //    ######################
+                          for ( i1 in families){                                      // write FAM part
+                              var family = families[i1]
+                              if ( family.pid     !== 0){ text = text + "0 @F" + family.pid + "@ FAM" + nl     }
+                              if (family.husband !== 0 ){ text = text + "1 HUSB @I" + family.husband + "@" + nl }
+                              if (family.wife    !== 0 ){ text = text + "1 WIFE @I" + family.wife    + "@" + nl }
+                              if (family.marriageDate !== "" ){
+                                  text = text + "1 MARR" + nl
+                                  if (family.marriageDate  !== "" ){ text = text + "2 DATE " + family.marriageDate  + nl }
+                                  if (family.marriagePlace !== "" ){ text = text + "2 PLAC " + family.marriagePlace  + nl }
+                              }
+                              if (family.divorceDate !== "" ){
+                                  text = text + "1 DIV" + nl
+                                  if (family.divorceDate  !== "" ){ text = text + "2 DATE " + family.divorceDate  + nl }
+                                  if (family.divorcePlace !== "" ){ text = text + "2 PLAC " + family.divorcePlace  + nl }
+                              }
+                              for (  i2 in family.children){
+                                  if (i2  !== 0){ text = text +"1 CHIL @I" + family.children[i2] + "@" + nl}
+                              }
+                              if ( family.note !== "" ){  text = text + writeNote(String(family.note).trim()) }
+                          }
+                          //    ######################
+                          text = text + '0 @S4@ SOUR\n'                               // TODO : replace with stored text
+                          text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
+                          text = text + '0 @S6@ SOUR\n'
+                          text = text + '1 TITL Euregio\n'
+                          text = text + '1 REPO @R1@\n'
+                          text = text + '0 @S20@ SOUR\n'
+                          text = text + '1 TITL (see notes)\n'
+                          text = text + '0 @S37@ SOUR\n'
+                          text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
+                          text = text + '0 @R1@ REPO\n'
+                          text = text + '1 NAME Euregio Familienbuch\n'
+                          text = text + '0 TRLR\n'
+                          // print(text)                                                // store test file
+                          var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/all-test.ged"
+                          // print(fileid)
+                          console.log(genealFile.fileExists(fileid))
 
-    var x = genealFile.writeFile(fileid,text)
+                          var x = genealFile.writeFile(fileid,text)
 
-}
-//######################################
+        }
+                          //######################################
