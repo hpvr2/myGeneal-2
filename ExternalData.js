@@ -25,7 +25,7 @@ function readIni(){                       //todo:  not yet tested
     console.log("readIni called" );
     var path = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/myGeneal.ini"
     var text = genealFile.readFile(path);          // read file and split into lines
-    var a = text.split("\r\n");
+    var a = text.split("\n");
     var i = 0
     console.log("ini")
     var line
@@ -60,4 +60,127 @@ function readIni(){                       //todo:  not yet tested
         }
         }
     }
+}
+
+//#####################################################
+function writeCSV(){
+    var text = ""
+    var nl = "\n"
+    for ( var i in persons){
+        var person = persons[i]
+        text = text + person.pid + ";"+person.gender + ";" +person.givenName + ";" + person.surName
+        text = text + ";" + person.birthDate + ";" + person.birthPlace
+        text = text + ";" + person.christianDate + ";" + person.christianPlace
+        text = text + ";" + person.deathDate + ";" + person.deathPlace + ";" + person.occupation
+        text = text + ";" + person.childOfFamily + ";" + person.parentInFamily
+        text = text + ";" + person.note.replace(/\n/g, "/*/").replace(/;/g, "/#/")+ nl
+    }
+    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/p-autosave.csv"
+    // print(fileid)
+    console.log(genealFile.fileExists(fileid))
+
+    var x = genealFile.writeFile(fileid,text)
+    //###########################################
+    text = ""
+    for (i in families) {
+        var family = families[i]
+        text = text + family.pid + ";" + family.husband + ";" +family.wife + ";"
+        text = text + family.marriageDate + ";" + family.marriagePlace
+        text = text + ";" + family.divorceDate + ";" + family.divorcePlace
+        text = text + ";" + family.children + ";"
+        text = text + family.note.replace(/\n/g, "/*/").replace(/;/g, "/#/")+ nl
+    }
+    fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/f-autosave.csv"
+    // print(fileid)
+    console.log(genealFile.fileExists(fileid))
+
+    x = genealFile.writeFile(fileid,text)
+}
+//###########################################
+function readCSV_P(){
+    //var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/p-autosave.csv"
+    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/myGeneal.ini"
+    print(fileid)
+    console.log(genealFile.fileExists(fileid))
+    var text = genealFile.readFile(fileid)
+    print(text)
+    console.log("from file : " + text)
+
+    text  = text.split("\n")
+    print("as lines "+ text)
+    var creatorP = Qt.createComponent("Person.qml")   // define factory for person
+    var person = creatorP.createObject(appWindow)
+
+    var CSV
+    var x
+    for (var i in  text) {
+        CSV = text[i].split(";")
+        print("CSV "+CSV)
+        person = creatorP.createObject(appWindow)
+
+        person.pid = CSV[0]
+        person.gender = CSV[1]
+        person.givenName = CSV[2]
+        person.surName  = CSV[3]
+        person.birthDate  = CSV[4]
+        //    person.birthYear = self.datesort(person.bdate)
+        person.birthPlace = CSV[5]
+        person.christianDate = CSV[6]
+        person.christianPlace = CSV[7]
+        person.deathDate  = CSV[8]
+        person.deathPlace  = CSV[9]
+        person.occupation  = CSV[10]
+        person.childOfFamily = CSV[11]
+        x = CSV[12].split(",")
+        for ( var j in x) {
+            person.parentInFamily.push(x[j]) }
+        person.note =  CSV[13].replace("/-/",nl ).replace("/#/", ";")
+
+        persons.push(person)
+    }
+    //    for ( var j=0; j<persons.length;j++) {print(person[j].pid)}
+    return
+
+
+    //        if i > 0 and person.id == 0 : self.empty_indi.append(i)
+
+
+
+}
+//##############################################
+function readCSV_F(){
+    var fileid = "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/f-autosave.csv"
+    print(fileid)
+    console.log(genealFile.fileExists(fileid))
+    var text = genealFile.readFile(fileid)
+    print(text)
+    console.log("from file : " + text)
+    var nl = "\n"
+    text  = text.split(nl)
+    print("as lines "+ text)
+    var creatorF = Qt.createComponent("Family.qml")   // define factory for person
+
+    var CSV
+    var x
+    for (var i in  text) {
+        CSV = text[i].split(";")
+
+        family = creatorF.createObject(appWindow)
+
+        family.pid = CSV[0]
+        family.husband = CSV[1]
+        family.wife = CSV[2]
+        family.marriagDate = CSV[3]
+        family.marriagePlace = CSV[4]
+        family.divorceDate = CSV[5]
+        family.divorcePlace = CSV[6]
+        x = CSV[7].split(",")
+        for ( var j in x) {
+            family.children.push(x[j]) }
+        family.note = CSV[8].replace("/-/",nl ).replace("/#/", ";")
+
+        families.push(person)
+    }
+    //    for ( var j=0; j<persons.length;j++) {print(person[j].pid)}
+    return
 }

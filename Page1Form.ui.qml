@@ -6,6 +6,7 @@ import "Gedcom.js" as Gedcom
 
 Item {
     id: item1
+
     property alias buttonReadGedcom: buttonReadGedcom
     property alias labelPid: labelPid
     property alias textFieldGivenName: textFieldGivenName
@@ -56,14 +57,18 @@ Item {
     property alias textFieldSelectFrom: textFieldSelectFrom
     property alias textFieldSelectName: textFieldSelectName
     property alias textSelection: textSelection
-    height: 200
-    z: 2147483646
+    height: 800
+    property alias textEditHeader: textEditHeader
+    property alias buttonEditHeader: buttonEditHeader
+    property alias buttonSave: buttonSave
 
+    width: 1000
+    z: 2147483646
 
     ListView{
         id: listViewParents
         x: 470
-        y: 42
+        y: 52
         width:200
         height: 71
         model :parents
@@ -99,7 +104,6 @@ Item {
             anchors.fill: parent
         }
     }
-
     Button {
         id: buttonNextFamily
         x: 239
@@ -109,7 +113,6 @@ Item {
         text: qsTr("next family")
         checked: true
     }
-
     Label {
         id: labelPid
         x: 21
@@ -118,7 +121,6 @@ Item {
         height: 13
         text: qsTr("Person Id :     ")
     }
-
     TextField {
 
         id: textFieldGivenName
@@ -130,7 +132,6 @@ Item {
 
 
     }
-
     TextField {
         id: textFieldBirthPlace
         x: 239
@@ -139,7 +140,6 @@ Item {
         height: 27
         text: qsTr("*  Birthplace")
     }
-
     TextField {
         id: textFieldBirthDate
         x: 21
@@ -148,7 +148,6 @@ Item {
         height: 27
         text: qsTr("*  Birthdate")
     }
-
     TextField {
         id: textFieldSurName
         x: 239
@@ -157,7 +156,6 @@ Item {
         height: 27
         text: qsTr("*  Surname")
     }
-
     Label {
         id: labelDied
         x: 21
@@ -166,7 +164,6 @@ Item {
         height: 13
         text: qsTr("Died : ")
     }
-
     Label {
         id: labelBorn
         x: 21
@@ -175,7 +172,6 @@ Item {
         height: 13
         text: qsTr("Born :     ")
     }
-
     TextField {
         id: textFieldDeathPlace
         x: 239
@@ -184,7 +180,6 @@ Item {
         height: 27
         text: qsTr("*  Deathplace")
     }
-
     TextField {
         id: textFieldDeathDate
         x: 21
@@ -193,7 +188,6 @@ Item {
         height: 27
         text: qsTr("*  Deathdate")
     }
-
     Label {
         id: labelMarried
         x: 21
@@ -202,7 +196,6 @@ Item {
         height: 13
         text: qsTr("Married in family ....")
     }
-
     TextField {
         id: textFieldDivorcePlace
         x: 239
@@ -211,7 +204,6 @@ Item {
         height: 27
         text: qsTr("*  Divorceplace")
     }
-
     TextField {
         id: textFieldDivorceDate
         x: 21
@@ -220,7 +212,6 @@ Item {
         height: 27
         text: qsTr("*  Divorcedate")
     }
-
     TextField {
         id: textFieldMarryPlace
         x: 239
@@ -229,7 +220,6 @@ Item {
         height: 27
         text: qsTr("*  Marryplace")
     }
-
     TextField {
         id: textFieldMarryDate
         x: 21
@@ -238,7 +228,6 @@ Item {
         height: 27
         text: qsTr("*  Marrydate")
     }
-
     Label {
         id: labelDivorced
         x: 21
@@ -247,7 +236,6 @@ Item {
         height: 13
         text: qsTr("Divorced")
     }
-
     Label {
         id: labelOccupation
         x: 21
@@ -256,7 +244,6 @@ Item {
         height: 13
         text: qsTr("Occupation")
     }
-
     TextField {
         id: textFieldOccupation
         x: 21
@@ -265,7 +252,6 @@ Item {
         height: 27
         text: qsTr("*  Occupation")
     }
-
     Button {
         id: buttonNextId
         x: 239
@@ -274,7 +260,6 @@ Item {
         height: 19
         text: qsTr("next person")
     }
-
     Rectangle {
         id: rectangleGender
         x: 129
@@ -284,7 +269,6 @@ Item {
         color: "green"
         radius: 6
     }
-
     Label {
         id: labelPersonNote
         x: 24
@@ -293,7 +277,6 @@ Item {
         height: 13
         text: qsTr("Person-Note")
     }
-
     TextEdit {
         id: textEditPnote
         x: 30
@@ -303,7 +286,6 @@ Item {
         text: qsTr("none")
         font.pixelSize: 12
     }
-
     Label {
         id: labeParents
         x: 470
@@ -312,7 +294,6 @@ Item {
         height: 13
         text: qsTr("Parents :  ")
     }
-
     Button {
         id: buttonDiscoParents
         x: 581
@@ -321,7 +302,6 @@ Item {
         height: 19
         text: qsTr("disconnect from parents")
     }
-
     Button {
         id: buttonDiscoPartner
         x: 581
@@ -331,7 +311,6 @@ Item {
         text: qsTr("disconnect from partner")
         checked: true
     }
-
     Label {
         id: labePartners
         x: 470
@@ -340,7 +319,6 @@ Item {
         height: 13
         text: qsTr("Partners")
     }
-
     Label {
         id: labeChilderen
         x: 470
@@ -349,7 +327,6 @@ Item {
         height: 13
         text: qsTr("Children")
     }
-
     Button {
         id: buttonDiscoChild
         x: 588
@@ -359,7 +336,6 @@ Item {
         text: qsTr("disconnect child")
         checked: true
     }
-
     Label {
         id: labeMessages
         x: 21
@@ -368,7 +344,6 @@ Item {
         height: 13
         text: qsTr("Messages")
     }
-
     Label {
         id: labelfamilyNote
         x: 477
@@ -377,7 +352,6 @@ Item {
         height: 13
         text: qsTr("Family-Note")
     }
-
     TextEdit {
         id: textEditPnote1
         x: 477
@@ -387,7 +361,6 @@ Item {
         text: qsTr("none")
         font.pixelSize: 12
     }
-
     TextEdit {
         id: textEditMessages
         x: 21
@@ -397,16 +370,14 @@ Item {
         text: qsTr("none")
         font.pixelSize: 12
     }
-
     Button {
         id: buttonSelectOther
-        x: 25
-        y: 738
+        x: 743
+        y: 57
         width: 117
         height: 17
         text: qsTr("Select other person")
     }
-
     Button {
         id: buttonPrevious
         x: 345
@@ -415,58 +386,52 @@ Item {
         height: 19
         text: qsTr("previous person")
     }
-
     Button {
         id: buttonAddNewPerson
-        x: 156
-        y: 738
+        x: 743
+        y: 93
         width: 117
         height: 17
         text: qsTr("add new person")
     }
-
     Button {
         id: buttonDeletePerson
-        x: 156
-        y: 775
+        x: 877
+        y: 93
         width: 117
         height: 17
         text: qsTr("delete person")
     }
-
     Button {
         id: buttonOptions
-        x: 289
-        y: 738
+        x: 743
+        y: 21
         width: 117
         height: 17
         text: qsTr("Show Options")
     }
-
     Button {
         id: buttonShowDocs
-        x: 25
-        y: 775
+        x: 877
+        y: 62
         width: 117
         height: 17
         text: qsTr("Show Documents")
     }
-
     Button {
         id: buttonShowAnchesterTree
-        x: 289
-        y: 775
+        x: 866
+        y: 21
         width: 139
         height: 17
         text: qsTr("Show Anchestor Tree")
     }
-
     ListView {
         id: listViewChilds
         x: 470
         y: 282
         width: 200
-        height: 106
+        height: 200
         model: childs
         delegate: Text{
             text: bYear +"-"+dYear+" " + givenName + surName
@@ -477,14 +442,17 @@ Item {
 
         MouseArea {
             id: mouseAreaChilds
+            anchors.rightMargin: 0
+            anchors.bottomMargin: 0
+            anchors.leftMargin: 0
+            anchors.topMargin: 0
             anchors.fill: parent
         }
     }
-
     Rectangle {
         id: rectOptions
-        x: 8
-        y: 8
+        x: 24
+        y: 14
         width: 962
         height: 716
         gradient: Gradient {
@@ -612,51 +580,50 @@ Item {
             text: "Write HTML Files ( TODO )"
             font.pixelSize: 16
         }
-    }
 
+        Button {
+            id: buttonEditHeader
+            x: 28
+            y: 320
+            width: 131
+            height: 40
+            text: qsTr("Edit Header Records")
+            checkable: true
+            z: 2
+            checked: false
+        }
+
+        TextEdit {
+            id: textEditHeader
+            x: 205
+            y: 320
+            width: 300
+            height: 200
+            text: qsTr("Header :")
+            font.pixelSize: 12
+        }
+    }
     Rectangle {
         id: rectSelect
-        x: 506
+        x: 463
         y: 21
-        width: 962
-        height: 700
+        width: 500
+        height: 720
         color: "#d3d3b5"
         visible: false
 
-        TextField {
-            id: textFieldSelectFrom
-            x: 58
-            y: 163
-            width: 198
-            height: 27
-            text: qsTr("")
-        }
-
-        TextField {
-            id: textFieldSelectTo
-            x: 295
-            y: 163
-            width: 198
-            height: 27
-            text: qsTr("")
-        }
-
-        TextField {
-            id: textFieldSelectName
-            x: 60
-            y: 73
-            width: 159
-            height: 27
-            text: qsTr("")
-        }
-
         ListView {
             id: listViewSelect
-            x: 58
-            y: 209
-            width: 200
-            height: 600
+            x: 66
+            y: 208
+            width: 300
+            height: 500
+            visible: true
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 12
             focus: true
+
+
             delegate: Text {
                 text: bYear +"-"+dYear+" " + givenName + surName
             }
@@ -665,45 +632,19 @@ Item {
                 id: mouseAreaSelect
                 anchors.fill: parent
             }
+
         }
 
-        Text {
-            id: textSelection
-            x: 29
-            y: 8
-            text: qsTr("Please enter option to restrict the seach")
-            visible: true
-            font.pixelSize: 12
-        }
 
-        Text {
-            id: textSelection1
-            x: 60
-            y: 45
-            text: "Surname beginning with ..."
-            font.pixelSize: 12
-        }
 
-        Text {
-            id: textSelection3
-            x: 60
-            y: 136
-            text: qsTr("Born between ...")
-            font.pixelSize: 12
-        }
 
-        Text {
-            id: textSelection4
-            x: 300
-            y: 136
-            text: qsTr("and ...")
-            font.pixelSize: 12
-        }
+
+
 
         GroupBox {
             id: groupBox
-            x: 270
-            y: 34
+            x: 229
+            y: 37
             width: 300
             height: 80
             title: qsTr("If known, specify Gender")
@@ -736,10 +677,73 @@ Item {
                 autoExclusive: false
             }
         }
+
+        Text {
+            id: textSelectionSurname
+            x: 53
+            y: 49
+            text: "Surname beginning with ..."
+            font.pixelSize: 12
+
+            TextField {
+                id: textFieldSelectName
+                x: 3
+                y: 27
+                width: 159
+                height: 27
+                text: qsTr("")
+            }
+        }
+
+        Text {
+            id: textSelectionBorn
+            x: 62
+            y: 134
+            text: qsTr("Born between ...")
+            font.pixelSize: 12
+
+            TextField {
+                id: textFieldSelectFrom
+                x: -2
+                y: 28
+                width: 198
+                height: 27
+                text: qsTr("")
+            }
+        }
+
+        Text {
+            id: textSelectionTo
+            x: 279
+            y: 139
+            text: qsTr("and ...")
+            font.pixelSize: 12
+
+            TextField {
+                id: textFieldSelectTo
+                x: -4
+                y: 22
+                width: 198
+                height: 27
+                text: qsTr("")
+            }
+        }
+        Text {
+            id: textSelection
+            x: 53
+            y: 8
+            text: qsTr("Please enter option to restrict the seach")
+            visible: true
+            font.pixelSize: 12
+        }
     }
 
-
-
-
-
+    Button {
+        id: buttonSave
+        x: 743
+        y: 138
+        width: 117
+        height: 17
+        text: qsTr("save screen data")
+    }
 }

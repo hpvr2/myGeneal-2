@@ -19,8 +19,6 @@ Item {                                  // Definition of a family object
     function prt(){
         console.log(pid + " " + husband+  " " + wife + " " + marriageDate + marriagePlace +" Childs " + children)
     }
-
-
 }
 
 

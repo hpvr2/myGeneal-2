@@ -48,3 +48,5 @@ Temporary Items
 
 # QtCreator
 *.pro.user
+*.user
+*.GL3692

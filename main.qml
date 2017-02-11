@@ -8,18 +8,17 @@ ApplicationWindow {
     id: appWindow
     visible: true
     width: 1200
-    height: 800
+    height: 600
     color: "lightgrey"
     title: qsTr("myGeneal 0.2")
 
     property Item settings: SetInit {    }
 
 
-    Page1 {
+
+    Page1 {   }
 
 
-
-    }
 
 }
 
