@@ -1,8 +1,10 @@
 // EditPage : functions for Display and edit of Data
+
+
 function select(gender,name,from , to){      // selection list ( filtered ) for persons
 
     print("Selection called : "+ gender +" "+ name + " "+ from+" "+ to   )
-    rectSelect.visible = true
+
     name = name.toLowerCase()
     if ( from === "    ") from = 0
     var p1
@@ -67,15 +69,18 @@ function setRelatives(actualId){             // set person and family data in sc
     var partnerFamily
     var p1
     var person = persons[actualId]
-    person.prt()
-
+print(actualId)
     //### display person related data
     labelPid.text = "Person Id : " +    person.pid
 
-    rectangleGender.color=   ( person.gender === "M") ? "cyan" : "pink"
+//    rectangleGender.color=   ( person.gender === "M") ? "cyan" : "pink"
 
     textFieldGivenName.text = person.givenName
+    textFieldGivenName.font.bold = true
+    textFieldGivenName.color =  ( person.gender === "M") ? "blue" : "red"
     textFieldSurName.text   = person.surName
+    textFieldSurName.font.bold = true
+    textFieldSurName.color =  ( person.gender === "M") ? "blue" : "red"
     textFieldBirthDate.text = person.birthDate
     textFieldBirthPlace.text= person.birthPlace
     textFieldDeathDate.text = person.deathDate
@@ -111,7 +116,6 @@ function setRelatives(actualId){             // set person and family data in sc
 
     for (var i=0 ; i< person.parentInFamily.length ; i++){
         var xx = parseInt(person.parentInFamily[i])
-        print("xx "+xx)
         if ( isNaN(xx)) break                                       // TODO : check why, only occurs in readCSV
 
 
@@ -119,16 +123,13 @@ function setRelatives(actualId){             // set person and family data in sc
         if (xx !== 0 && xx  !== ""){
 
             partnerFamily              = families[familyIndex.indexOf(xx)]
-            partnerFamily.prt()
 
             if (person.gender === "F"){ p1 = persons[personIndex.indexOf(partnerFamily.husband)]}
             else {                      p1 = persons[personIndex.indexOf(partnerFamily.wife   )]}
 
-            print( familyIndex.indexOf(xx))
-                        p1.prt()
             partners.append({"pid"      : p1.pid,
                                 "givenName": p1.givenName.concat(blank).substr(0,30),
-                                "surName"  : p1.surName.concat(blank).substr(0,30),
+                                "surName"  : p1.surName.concat(blank).substr(0,30) ,
                                 "bYear"    : p1.birthYear,
                                 "dYear"    : p1.deathYear})
 
@@ -157,8 +158,12 @@ function setRelatives(actualId){             // set person and family data in sc
     }
 }
 function saveScreen(){
+    print(actualId)
+    print(personIndex[actualId])
+    actualId = personIndex[actualId]
     var person= persons[actualId]
-    person.givenName = textFieldGivenName.text
+    person.prt()
+    person.givenName  = textFieldGivenName.text
     person.surName    = textFieldSurName.text
     person.birthDate  = textFieldBirthDate.text
     person.birthPlace = textFieldBirthPlace.text
@@ -170,3 +175,29 @@ function saveScreen(){
     persons[actualId]   = person
 
 }
+function addPerson (){
+    var creatorP = Qt.createComponent("Person.qml")   // define factory for person
+    var person = creatorP.createObject(appWindow)
+
+    if (unusedPersons.length === 0 ){
+        person.pid = persons.length
+
+    }
+    else {
+        person.pid = unusedPersons[0]
+        unusedPersons.splice(0,1)
+    }
+    personIndex.push(person.pid)
+    print(personIndex[personIndex.length-1])
+    print(personIndex.length)
+    person.surName = "-new person-"
+    persons[person.pid]= person
+    person.prt()
+
+    actualId = personIndex.length-1
+    print(actualId)
+    for ( var i = 1670 ; i< personIndex.length; i++) print(i + " " +personIndex[i])
+    setRelatives(person.pid)
+}
+
+

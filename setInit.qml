@@ -2,7 +2,9 @@ import QtQuick 2.0
 import "Gedcom.js" as Gedcom
 
 Item {
-    property url path : "file:///C:/Users/hans-/Documents/QML-Geneal/myGeneal-2/Data/" // todo : define user specific path
+    property url path : "file:///C:/Users/hans-/OneDrive/Data/" // todo : define user specific path
+    property url workPath : "file:///C:/Users/hans-/myGeneal/" // todo : define user specific path
+
     property string infile : "Bertram.ged"
 
     property string maleColor  : "none"

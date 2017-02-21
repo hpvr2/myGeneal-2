@@ -3,7 +3,7 @@ import QtQuick 2.0
 Item {                                          // Definition of a person object
 
     property int pid: 0
-    property string givenName : ""
+    property string givenName : " "
     property string surName : ""
     property string gender: ""
     property string occupation  : ""
