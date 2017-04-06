@@ -74,7 +74,7 @@ function writeCSV(){
         text = text + ";" + person.christianDate + ";" + person.christianPlace
         text = text + ";" + person.deathDate + ";" + person.deathPlace + ";" + person.occupation
         text = text + ";" + person.childOfFamily + ";" + person.parentInFamily
-        text = text + ";" + person.note.replace(/\n/g, "/*/").replace(/;/g, "/#/")+ nl
+        text = text + ";" + person.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
     var fileid = "file:///C:/Users/hans-/documents/myGeneal/p-autosave.csv"
     // print(fileid)
@@ -89,7 +89,7 @@ function writeCSV(){
         text = text + family.marriageDate + ";" + family.marriagePlace
         text = text + ";" + family.divorceDate + ";" + family.divorcePlace
         text = text + ";" + family.children + ";"
-        text = text + family.note.replace(/\n/g, "/*/").replace(/;/g, "/#/")+ nl
+        text = text + family.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
     fileid = "file:///C:/Users/hans-/documents/myGeneal/f-autosave.csv"
     // print(fileid)
@@ -141,7 +141,7 @@ function readCSV_P(fileid){
         for ( var j in x) {
             person.parentInFamily.push(x[j])
         }
-        person.note =  CSV[13].replace("/*/",nl ).replace("/#/", ";")
+        person.note =  CSV[13].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
         persons.push(person)
         personIndex.push(person.pid)
     }
@@ -191,7 +191,7 @@ function readCSV_F(fileid){
         x = CSV[7].split(",")
         for ( var j in x) {
             family.children.push(x[j]) }
-        family.note = CSV[8].replace("/-/",nl ).replace("/#/", ";")
+        family.note = CSV[8].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
         families.push(family)
         familyIndex.push(family.pid)
     }

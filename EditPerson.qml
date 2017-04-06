@@ -10,6 +10,24 @@ import "ExternalData.js" as External
 
 
 EditPersonForm {
+    tabViewChildren.onClicked: {
+        var p1 = childs.get(row)
+        actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
+        EditPage.setRelatives(actualId)
+    }
+    tabViewPartners.onClicked: {
+        var p1 = partners.get(row)
+        actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
+        EditPage.setRelatives(actualId)
+    }
+    tabViewParents.onClicked: {
+        var p1 = parents.get(row)
+        actualId = personIndex.indexOf(p1.pid)
+        actualFam = 0
+        EditPage.setRelatives(actualId)
+    }
 
     MessageDialog{
         id : msgBox
@@ -28,8 +46,8 @@ EditPersonForm {
             if ( this.title === "initial" ) {print("unkown message dialog : "+this.title)}
 
         }
-            onNo: print("NO pressed for : "+this.title)
-            onRejected: print("aborted : "+this.title)
+        onNo: print("NO pressed for : "+this.title)
+        onRejected: print("aborted : "+this.title)
 
     }
 
@@ -52,15 +70,34 @@ EditPersonForm {
 
     buttonWriteHtml.onClicked: {
         External.writeHtmlP1()
-}
+    }
     buttonSave.onClicked: {
         print("save")
         EditPage.saveScreen()
         External.writeCSV()
-}
+    }
     anchors.fill: parent
 
     Component.onCompleted: {
+        var fileid1 = "file:///C:/Users/hans-/Documents/myGeneal/p-autosave.csv"
+        var fileid2 = "file:///C:/Users/hans-/Documents/myGeneal/f-autosave.csv"
+        print(fileid1)
+        if (genealFile.fileExists(fileid1) === true && genealFile.fileExists(fileid2) === true) {
+            External.readCSV_P(fileid1)
+            External.readCSV_F(fileid2)
+            rectOptions.visible=false
+        }
+        else {
+            rectOptions.visible=true
+            rectPerson.visible=false
+
+        }
+    }
+
+
+
+
+    buttonReadCSV.onClicked: {
         var fileid = "file:///C:/Users/hans-/Documents/myGeneal/p-autosave.csv"
         print(fileid)
         External.readCSV_P(fileid)
@@ -69,21 +106,11 @@ EditPersonForm {
         External.readCSV_F(fileid)
         rectOptions.visible=false
 
-      }
-     buttonReadCSV.onClicked: {
-         var fileid = "file:///C:/Users/hans-/Documents/myGeneal/p-autosave.csv"
-         print(fileid)
-         External.readCSV_P(fileid)
-
-         fileid = "file:///C:/Users/hans-/Documents/myGeneal/f-autosave.csv"
-         External.readCSV_F(fileid)
-         rectOptions.visible=false
-
-     }
+    }
 
     buttonWriteGedcom.onClicked: {
         Gedcom.writeGedcom()
-}
+    }
 
 
     //#################################### next family
@@ -118,50 +145,39 @@ EditPersonForm {
     textFieldSelectTo.onTextChanged: {selectTo = textFieldSelectTo.text
         EditPage.select(selectGender,selectName,selectFrom,selectTo)}
 
-    ListModel{ id :selection   }
 
-    mouseAreaSelect.onClicked: {
-        print(mouseAreaSelect.mouseX+ " " + mouseAreaSelect.mouseX)
-        print(listViewSelect.indexAt(mouseAreaSelect.mouseX,mouseAreaSelect.mouseY))
-        var p1 = selection.get(listViewSelect.indexAt(mouseAreaSelect.mouseX,mouseAreaSelect.mouseY))
+
+    tabViewSelect.onClicked: {
+        var p1 = selectOther.get(row)
         actualId = personIndex.indexOf(p1.pid)
         actualFam = 0
+        rectSelect.visible= false
+        rectPerson.visible=true
         EditPage.setRelatives(actualId)
 
-        rectSelect.visible= false
+
     }
 
     buttonSelectOther.onClicked: {
         rectSelect.visible= true
+        rectPerson.visible=false
         EditPage.select(selectGender,selectName,selectFrom,selectTo)
 
     }
     //#################################### selection control
     ListModel{ id :childs   }
-    mouseAreaChilds.onClicked: {
-        var p1 = childs.get(listViewChilds.indexAt(mouseAreaChilds.mouseX,mouseAreaChilds.mouseY))
-        actualId = personIndex.indexOf(p1.pid)
-        actualFam = 0
-        EditPage.setRelatives(actualId)
-    }
     ListModel{ id :partners }
-    mouseAreaPartners.onClicked: {
-        var p1 = partners.get(listViewPartners.indexAt(mouseAreaPartners.mouseX,mouseAreaPartners.mouseY))
-        actualId = personIndex.indexOf(p1.pid)
-        actualFam = 0
-        EditPage.setRelatives(actualId)
-    }
     ListModel{ id :parents  }
-    mouseAreaParents.onClicked: {
-        var p1 = parents.get(listViewParents.indexAt(mouseAreaParents.mouseX,mouseAreaParents.mouseY))
-        actualId = personIndex.indexOf(p1.pid)
-        actualFam = 0
-        EditPage.setRelatives(actualId)
-    }
+    ListModel{ id :selectOther   }
     //#################################### option button
     buttonOptions.onClicked: {                                  // options
-        if (rectOptions.visible) {rectOptions.visible= false }
-        else{rectOptions.visible = true}
+        if (rectOptions.visible) {
+            rectOptions.visible= false
+            rectPerson.visible=true
+        }
+        else{rectOptions.visible = true
+            rectPerson.visible=false
+        }
     }
     //#################################### nextid button
     buttonNextId.onClicked: {                   // switch to next pid
@@ -171,17 +187,6 @@ EditPersonForm {
         EditPage.setRelatives(actualId)
     }
 
-    //    buttonSave.onClicked: {
-    //        EditPage.saveScreen(person)
-    //    }
-
-    //    textEditHeader.onTextChanged: {
-
-    //        for ( var i = 1; i< textEditHeader.length; i++){
-
-    //            header[i] = String(textEditHeader[i])}
-    //        print(header[i])
-    //    }
 
     buttonReadGedcom.onClicked: {
         fileDialog.visible = true
@@ -231,6 +236,7 @@ EditPersonForm {
 
             External.writeCSV()                                                         //TODO : move to closing code
             rectOptions.visible=false
+            rectPerson.visible=true
 
 
         }
