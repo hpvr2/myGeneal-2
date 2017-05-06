@@ -63,6 +63,11 @@ Item {
     property var header :[]
     
     width: 1000
+    property alias buttonAddStop: buttonAddStop
+    property alias buttonAddDaughter: buttonAddDaughter
+    property alias buttonAddSon: buttonAddSon
+    property alias varSelect: varSelect
+    property alias buttonGender: buttonGender
     property alias tabViewSelect: tabViewSelect
     property alias tabViewChildren: tabViewChildren
     property alias tabViewPartners: tabViewPartners
@@ -86,6 +91,7 @@ Item {
 
     Rectangle {
         id: rectPerson
+        x: 0
         
         color: "#dedcdc"
         visible: true
@@ -580,6 +586,15 @@ Item {
                     Layout.columnSpan: 2
                     Layout.row : 10
 
+                    Button {
+                        id: buttonGender
+                        x: 117
+                        y: -5
+                        text: qsTr("Select Gender")
+                        checked: true
+                        checkable: true
+                    }
+
                     TextEdit {
                         id: textEditPnote
                         width: 500
@@ -590,6 +605,7 @@ Item {
 
 
                     }
+
 
 
                 }
@@ -613,19 +629,17 @@ Item {
 
     Rectangle {
         id: rectSelect
-        x: 1000
-        width: 300
+        width: 600
         height: 500
         color: "#d3d3b5"
         radius: 2
+        anchors.left: parent.left
+        anchors.leftMargin: 500
+        anchors.top: rectPerson.bottom
+        anchors.topMargin: 0
         antialiasing: true
         smooth: true
         enabled: true
-        anchors.rightMargin: 0
-        anchors.topMargin: 0
-        anchors.bottomMargin: -174
-        anchors.leftMargin: 470
-        anchors.fill: parent
         z: 4
         visible: false
 
@@ -645,6 +659,16 @@ Item {
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
             visible: true
+
+            Text {
+                id: varSelect
+                x: 253
+                text: qsTr("* person/child/partner/parent")
+                anchors.top: parent.top
+                anchors.topMargin: 19
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: 12
+            }
 
             Text {
                 id: textSelectionSurname
@@ -677,8 +701,17 @@ Item {
                         enabled: true
                         //autoExclusive: false
                     }
+
+                    Button {
+                        id: buttonAddSon
+                        x: 275
+                        y: 5
+                        text: qsTr("add son")
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
+
 
             Text {
                 id: textSelectionBorn
@@ -712,6 +745,14 @@ Item {
                         anchors.left: parent.left
                         anchors.leftMargin: 200
                     }
+
+                    Button {
+                        id: buttonAddDaughter
+                        x: 275
+                        y: -1
+                        text: qsTr("add daughter")
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
 
@@ -744,13 +785,21 @@ Item {
                         anchors.left: parent.left
                         anchors.leftMargin: 200
                     }
+
+                    Button {
+                        id: buttonAddStop
+                        x: 275
+                        y: 2
+                        text: qsTr("Abort")
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
             }
 
             TableView {
                 id: tabViewSelect
                 width: 400
-                height: 400
+                height: 300
                 anchors.left: textSelectionTo.right
                 anchors.leftMargin: -20
                 anchors.top: textSelectionTo.bottom
@@ -791,6 +840,7 @@ Item {
                     role: "surName"
                 }
             }
+
 
         }
     }

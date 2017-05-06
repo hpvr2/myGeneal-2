@@ -27,8 +27,6 @@ ApplicationWindow {
     property var families :[]
     property var trailer : []
 
-    property var personIndex : []
-    property var familyIndex : []
     property var unusedPersons :[]
     property var unusedfanilies : []
 
@@ -37,13 +35,21 @@ ApplicationWindow {
     property Family family: null
     property Person person: null
 
+    property string selectType: "person"
     property string selectGender: ""
     property string selectName : ""
+    property string childGen : "U"
+
     property int selectFrom: 0      //todo variable year
-    property int selectTo : 2017   // todo variable year
+    property int selectTo : 20+ Qt.formatDateTime(new Date(), "yyMMdd").substring(0,2)   // actual year
+
+    property string path : appWindow.settings.path
+
 
     onClosing: {
         print ("closing")
+        print( path )
+
         Gedcom.writeGedcom()
         print("done")
     }

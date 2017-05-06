@@ -8,11 +8,7 @@
         <file>Family.qml</file>
         <file>EditPage.js</file>
         <file>ExternalData.js</file>
-        <file>ExtIO.qml</file>
-        <file>ExtIOForm.ui.qml</file>
         <file>EditPerson.qml</file>
         <file>EditPersonForm.ui.qml</file>
-        <file>ExternalIO.qml</file>
-        <file>ExternalIOForm.ui.qml</file>
     </qresource>
 </RCC>

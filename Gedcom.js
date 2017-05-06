@@ -1,7 +1,7 @@
 // Gedcom : functions for reading and writing GEDCOM Files
 //*************************************************************************************
 //#####################################################
-function parseHEADER(a){                                // Extract HEADER data from GEDCOM array "a"
+function parseHEADER(a){           // Extract HEADER data from GEDCOM array "a"
 
     textEditHeader.clear()
     var text = ""
@@ -27,7 +27,7 @@ function parseHEADER(a){                                // Extract HEADER data f
     return
 }
 //################################
-function parseTRAILER(a){                                // Extract Trailer data from GEDCOM array "a"
+function parseTRAILER(a){          // Extract Trailer data from GEDCOM array "a"
 
     textEditTrailer.clear()
     var text = ""
@@ -48,9 +48,11 @@ function parseTRAILER(a){                                // Extract Trailer data
     return
 }
 //#######################################################
-function parseINDI(a){                                // Extract Person data from GEDCOM array "a"
+function parseINDI(a){             // Extract Person data from GEDCOM array "a"
     var creatorP = Qt.createComponent("Person.qml")   // define factory for person
     var person = creatorP.createObject(appWindow)     // actual person
+    var person0 = creatorP.createObject(appWindow)     // empty person
+
 
     var i = 0
     var nl = "\n"
@@ -69,8 +71,13 @@ function parseINDI(a){                                // Extract Person data fro
             //            console.log ("start of FAMILY part , line : "+ i1 +": "+ line)
             startFam = i1
             // cleanup person note : splitNote(person.note)
-            persons.push(person)            // store last person
-            personIndex.push(person.pid)
+            for (var j = persons.length;j< person.pid;j++){
+                persons[j] = person0
+                persons[j].pid = -1
+//                print( j, " " ,persons[j].pid)
+            }
+
+            persons[person.pid] = person       // store last person
             break
         }
         else {
@@ -78,8 +85,13 @@ function parseINDI(a){                                // Extract Person data fro
             case "INDI" :{                              // next person Record found
                 var xx = token[1].match(/\d+/g)[0]      // temp person.pid
                 // cleanup person note
-                persons.push(person)                    // store last person
-                personIndex.push(person.pid)
+//                print("add 0 from ",persons.length," to ",person.pid)
+                for (var j = persons.length;j< person.pid;j++){
+                    persons[j] = person0
+                    persons[j].pid = -1
+//                    print( j, " " ,persons[j].pid)
+                }
+                persons[person.pid] = person                    // store last person
 
                 person = creatorP.createObject(appWindow) // new person
                 person.pid = xx                           // use temp stored id
@@ -144,24 +156,26 @@ function parseINDI(a){                                // Extract Person data fro
             }
         }
     }
-      xx =Math.max.apply(Math,personIndex)
-    //    print("end of parseINDI")
-    //    print("p-max "+xx)
+    for (var j = 0;j <=persons.length-1;j++){
+        print( j, " " ,persons[j].pid, " ",persons[j].givenName, " ",persons[j].surName)
+    }
+    print("end of parseINDI")
     unusedPersons.length = 0
-        for ( i = 1; i <xx; i++) {
-            if ( i in personIndex ){
-                if ( personIndex.indexOf(i) <=0 ) {unusedPersons.push(i)}
-            }
+    for ( i = 1; i <persons.length; i++) {
+        if ( persons[i].pid === -1 ){
+            unusedPersons.push(i)
         }
-      print(unusedPersons)
+    }
+    print(unusedPersons)
     return
 }
 //##############################################################################
-function parseFAM(a){                                   // Extract family data from GEDCOM array "a"
+function parseFAM(a){              // Extract family data from GEDCOM array "a"
     //     print("start of parseFAM")
 
     var creatorF = Qt.createComponent("Family.qml")   // define factory for family
     var family = creatorF.createObject(appWindow)     // actual family
+    var family0 = creatorF.createObject(appWindow)     // actual family
 
     var i = 0
     var dateFlag = "none"
@@ -175,8 +189,12 @@ function parseFAM(a){                                   // Extract family data f
         var token = line.split(" ");
 
         if ( token[1] === "TRLR" || token[2] === "SOUR" ){   //end of FAM part
-            families.push(family)            // store last family
-            familyIndex.push(family.pid)
+            for (var j = families.length;j< family.pid;j++){
+                families[j] = family0
+               families[j].pid = -1
+//                print( j, " " ,persons[j].pid)
+            }
+            families[family.pid] =family            // store last family
             startTrailer = i1
 
             break
@@ -185,8 +203,13 @@ function parseFAM(a){                                   // Extract family data f
             switch(token[2]){
             case "FAM" :{                              // next family Record found
                 var xx = token[1].match(/\d+/g)[0]      // temp family.pid
-                families.push(family)                    // store last family
-                familyIndex.push(family.pid)
+
+                for (var j = families.length;j< family.pid;j++){
+                    families[j] = family0
+                   families[j].pid = -1
+    //                print( j, " " ,persons[j].pid)
+                }
+                families[family.pid] =family            // store last family
 
                 family = creatorF.createObject(appWindow) // new person
                 family.pid = xx                           // use temp stored id
@@ -235,7 +258,7 @@ function parseFAM(a){                                   // Extract family data f
     return //families
 }
 //##########################################################
-function writeNote(note){                                       // write a note in gedcom format
+function writeNote(note){          // write a note in gedcom format
     var cmd = "1 NOTE "
 
     var j=0
@@ -262,7 +285,7 @@ function writeNote(note){                                       // write a note 
     return text
 }
 //#######################################
-function writeGedcom(){
+function writeGedcom(){            // write GEDCOM file
 
     var path = "file:///C:/Users/hans-/OneDrive/Data/testOutput.ged"
     var i = 0
@@ -280,7 +303,7 @@ function writeGedcom(){
     for (var i1 in persons){                                    // write INDI part
         person = persons[i1]
         //     person.prt()
-        if (person.pid != 0){
+        if (person.pid >= 1){
             text = text +"0 @I" + person.pid + "@ INDI" + nl
             text = text +"1 NAME " +person.givenName + "/" + person.surName + "/" + nl
             text = text +"2 GIVN " + person.givenName + nl
@@ -316,7 +339,7 @@ function writeGedcom(){
     //    ######################
     for ( i1 in families){                                      // write FAM part
         var family = families[i1]
-        if ( family.pid     !== 0){ text = text + "0 @F" + family.pid + "@ FAM" + nl     }
+        if ( family.pid     >= 1)  { text = text + "0 @F" + family.pid + "@ FAM" + nl     }
         if (family.husband !== 0 ){ text = text + "1 HUSB @I" + family.husband + "@" + nl }
         if (family.wife    !== 0 ){ text = text + "1 WIFE @I" + family.wife    + "@" + nl }
         if (family.marriageDate !== "" ){

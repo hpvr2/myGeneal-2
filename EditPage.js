@@ -1,18 +1,32 @@
 // EditPage : functions for Display and edit of Data
 
 
-function select(gender,name,from , to){      // selection list ( filtered ) for persons
+function select(gender,name,from , to){  // selection list ( filtered ) for persons
 
-    print("Selection called : "+ gender +" "+ name + " "+ from+" "+ to   )
+   print("Selection called : " +  gender +" "+ name + " "+ from+" "+ to   )
+
 
     name = name.toLowerCase()
-    if ( from === "    ") from = 0
+    if ( from === "    ") from = selectFrom
+    if ( to   === "    ") to = selectTo
     var p1
     var x = ""
     var blank = "                                        "
-    var count = 0
+    //    var count = 0
     selectOther.clear()
-    for ( var i in persons) {
+
+    varSelect.text = selectType
+
+//    textFieldSelectFrom.text = from
+//    textFieldSelectTo.text = to
+//    textFieldSelectName.text = name
+    radioButtonUnknown.checked = true
+    radioButtonMale.checked = false
+    radioButtonFemale.checked = false
+
+        print("start loop")
+    for ( var i in persons)
+    {
         p1 = persons[i]
 
         x = String(p1.surName).substring(0,name.length).toLowerCase()
@@ -20,23 +34,27 @@ function select(gender,name,from , to){      // selection list ( filtered ) for 
         if ( (gender === "" || gender === p1.gender) &&  // gender not specified or matching
                 ( x === name) &&                         // surname starting with name ( in lowercase )
                 (from < p1.birthYear) &&                 // from earlier than birthyear
-                (to === "" || to > p1.birthYear)     ) { // to later than birthyear
-            count++
-            print(p1.pid+" " +p1.givenName+ " " +p1.surName)
+                (to === "" || to > p1.birthYear)     )   // to later than birthyear
+        {
+            //            count++
+            //            print(p1.pid+" " +p1.givenName+ " " +p1.surName)
             selectOther.append({ "pid": p1.pid,
-                                 "givenName": p1.givenName,
-                                 "surName"  : p1.surName,
-                                 "bYear" : p1.birthYear,
-                                 "dYear" :p1.deathYear})
+                                   "givenName": p1.givenName,
+                                   "surName"  : p1.surName,
+                                   "bYear" : p1.birthYear,
+                                   "dYear" :p1.deathYear})
 
             //print(selection.get(1))
         }
     }
-    print(count)
+    // TODO : 3 unnecessary loops !!!!!!!!!!!!!!
+        textFieldSelectFrom.text = from
+        textFieldSelectTo.text = to
+        textFieldSelectName.text = name
+    //    print(count)
     return
 }
-// #########################################################
-function splitPNote(note){
+function splitPNote(note){               // split person note on screen
     var nl = "\n"
     while (note.length >  0 ) {
         var x = note.indexOf(nl)
@@ -52,7 +70,7 @@ function splitPNote(note){
         }
     }
 }
-function splitFNote(note){
+function splitFNote(note){               // split family note on screen
     var nl = "\n"
     while (note.length >  0 ) {
         var x = note.indexOf(nl)
@@ -68,14 +86,14 @@ function splitFNote(note){
         }
     }
 }
-function setRelatives(actualId){             // set person and family data in screen
+function setRelatives(actualId){         // set person and family data in screen
 
     var blank = "                               "
-    var parentFamily
-    var partnerFamily
+
     var p1
     var person = persons[actualId]
-    print(actualId)
+    print("setrel ",actualId)
+    person.prt()
     //### display person related data
     labelPid.text = "Person Id : " +    person.pid
 
@@ -102,15 +120,15 @@ function setRelatives(actualId){             // set person and family data in sc
     parents.clear()
     //    person.prt()
     if (person.childOfFamily !== 0){
-        parentFamily = families[familyIndex.indexOf(person.childOfFamily)]
+        parentFamily = families[person.childOfFamily]
         //        parentFamily.prt()
-        p1 = persons[personIndex.indexOf(parentFamily.husband)]
+        p1 = persons[parentFamily.husband]
         parents.append({ "pid": p1.pid,
                            "givenName": p1.givenName,
                            "surName"  : p1.surName,
                            "bYear" : p1.birthYear,
                            "dYear" :p1.deathYear} )
-        p1 = persons[personIndex.indexOf(parentFamily.wife)]
+        p1 = persons[parentFamily.wife]
         parents.append({"pid": p1.pid,
                            "givenName": p1.givenName,
                            "surName"  : p1.surName,
@@ -135,10 +153,10 @@ function setRelatives(actualId){             // set person and family data in sc
 
         if (xx !== 0 && xx  !== ""){
 
-            partnerFamily              = families[familyIndex.indexOf(xx)]
+            partnerFamily              = families[xx]
 
-            if (person.gender === "F"){ p1 = persons[personIndex.indexOf(partnerFamily.husband)]}
-            else {                      p1 = persons[personIndex.indexOf(partnerFamily.wife   )]}
+            if (person.gender === "F"){ p1 = persons[partnerFamily.husband]}
+            else {                      p1 = persons[partnerFamily.wife   ]}
 
             partners.append({"pid"      : p1.pid,
                                 "givenName": p1.givenName,
@@ -154,25 +172,28 @@ function setRelatives(actualId){             // set person and family data in sc
                 textFieldDivorcePlace.text = partnerFamily.divorcePlace
 
                 for ( var j=0 ; j< partnerFamily.children.length ; j++){
-                    p1 = persons[personIndex.indexOf(parseInt(partnerFamily.children[j]))]
+                    p1 = persons[parseInt(partnerFamily.children[j])]
                     childs.append({   "pid"       : p1.pid,
                                       "givenName" : p1.givenName,
                                       "surName"   : p1.surName,
                                       "bYear"     : p1.birthYear,
                                       "dYear"     : p1.deathYear})
                 }
+                childs.append({   "pid"       : -1,
+                                  "givenName" : "select / add new child",
+                                  "surName"   : "",
+                                  "bYear"     : "",
+                                  "dYear"     : ""})
             }
         }                                                //todo : support for multiple families
 
-           splitPNote("\nFamily Note :\n"+partnerFamily.note)
-//        textEditFnote.clear()
-//        splitFNote(partnerFamily.note)
+        splitPNote("\nFamily Note :\n"+partnerFamily.note)
+        //        textEditFnote.clear()
+        //        splitFNote(partnerFamily.note)
     }
 }
-function saveScreen(){
+function saveScreen(){                   // save person data modified on screen
     print(actualId)
-    print(personIndex[actualId])
-    actualId = personIndex[actualId]
     var person= persons[actualId]
     person.prt()
     person.givenName  = textFieldGivenName.text
@@ -185,30 +206,48 @@ function saveScreen(){
     person.note       = textEditPnote.text
 
     persons[actualId]   = person
+    person.prt()
+    persons[actualId].prt()
 
 }
-function addPerson (){
+function addPerson (p1,p2){              // add new person / child / partner / parent
+
+    // p1 gender ( "M","F","" )
+    // p2  surname ( as child/father )
+    print(p1,p2)
     var creatorP = Qt.createComponent("Person.qml")   // define factory for person
     var person = creatorP.createObject(appWindow)
 
     if (unusedPersons.length === 0 ){
         person.pid = persons.length
-
     }
     else {
         person.pid = unusedPersons[0]
         unusedPersons.splice(0,1)
     }
-    personIndex.push(person.pid)
-    print(personIndex[personIndex.length-1])
-    print(personIndex.length)
-    person.surName = "-new person-"
-    persons[person.pid]= person
-    person.prt()
+    if (p1==="") p1 = "M"
+    person.gender = String(p1)
+    if ( p1 === "M") {person.givenName = "* male *"}
+    else {person.givenName = "* female *"}
+    if (p2 === "" ) p2 = "-new person-"
+    person.surName = p2
+    if ( selectType=== "child" ){
+        families[partnerFamily.pid].children.push(person.pid)
+        print(families[partnerFamily.pid].children)
+        person.childOfFamily = partnerFamily.pid
+        print(person.childOfFamily)
 
-    actualId = personIndex.length-1
-    print(actualId)
-    for ( var i = 1670 ; i< personIndex.length; i++) print(i + " " +personIndex[i])
+    }
+
+    actualId = person.pid
+    actualFam = 0
+    print("new : ",actualId)
+    persons[actualId]= person
+    person.prt()
+    persons[actualId].prt()
+
+
+    //saveScreen()
     setRelatives(person.pid)
 }
 
