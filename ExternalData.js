@@ -1,29 +1,29 @@
 // ExternalData : functions to handle I/O to other ( non-Gedcom ) files
 
-function setInit(){          // set init values ( TODO not active )
-    var constants = {
-        path : "file:///C:/Users/hans-/OneDrive/Data/", // todo : define user specific path
+function setInit(){          // set init values
+    var c = {
+        path : "file:///C:/Users/hans-/OneDrive/myGeneal",
         infile : "Bertram.ged",
 
-        maleColor  : "yellow",
-        femaleColor : "pink",
+        maleColor  : "blue",
+        femaleColor : "red",
 
         firstYear : 1500,
-        lastYear  : 2017 ,  // todo : use actual year
+        lastYear  : 20+ Qt.formatDateTime(new Date(), "yyMMdd").substring(0,2) ,  // actual year
 
-        ageAtBirth_male   : 19,
+        ageAtBirth_male   : 19, // TODO : not used  uptonow
         ageAtBirth_female : 16,
         maxAge_father     : 60,
         maxAge_mother     : 50,
         maxAge            : 100,
         maxAgeDelta_childs   : 40,
-        maxAgeDelta_partners : 60,
+        maxAgeDelta_partners : 50,
     }
-    return constants
+    return c
 }
-function readIni(){          // read init values ( TODO nat active )
+function readIni(){          // read init values ( TODO not active )
     console.log("readIni called" );
-    var path = "file:///C:/Users/hans-/documents/myGeneal/myGeneal.ini"
+    var path = standard.path+"/myGeneal.ini"
     var text = genealFile.readFile(path);          // read file and split into lines
     var a = text.split("\n");
     var i = 0
@@ -34,35 +34,49 @@ function readIni(){          // read init values ( TODO nat active )
     for (i = 0; i < a.length; i++) {                // first loop : ignore header : todo
 
         line =a[i]
-        line = line.replace(/\s\s+/g, ' ');print(line)
+        line = line.replace(/\s\s+/g, ' ')
         token = line.split(" ")
         for ( i=0; i<token.length;i++){print(i+"*"+token[i])}
         //console.log(line)
         switch (token[0]){
-        case "Path"               :{ path = token[1]; print("*"+token[1]);break}
-        case "Infile"             :{ infile = token[1]; print(infile); break}
-        case "Outfile"            :{ outfile = token[1]; break}
-        // case "DebugOn"           :{ ........... break}
+        case "Path"               :{
+            path = token[1];break}
+        case "Infile"             :{
+            infile = token[1]; break}
+        case "Outfile"            :{
+            outfile = token[1]; break}
+        // case "DebugOn"           : ........... break}
 
-        case "Malecol"            : {maleColor = token[1]; break}
-        case "Femalecol"          : {femaleColor = token[1]; break}
-        case "Firstyear"          : {firstYear = token[1]; break}
-        case "Lastyear"           : {lastYear = token[1]; break}
-        case "Ageatbirth_male"    : {ageAtBirth_male = token[1]; break}
-        case "Ageatbirth_female"  : {ageAtBirth_female = token[1]; break}
-        case "Maxage_father"      : {maxAge_father = token[1]; break}
-        case "Maxage_mother"      : {maxAge_mother = token[1]; break}
-        case "Maxage"             : { maxAge = token[1]; break}
-        case "Maxdelta_childs"    : {maxAgeDelta_childs = token[1]; break}
-        case "Maxdelta_partners"  : {maxAgeDelta_partners = token[1]; break}
-        case "Startid"            : {startid = token[1]; break}
-        default                   : {console.log("invalid value : " + line)
-        }
+        case "Malecol"            :
+            standard.maleColor = token[1]; break
+        case "Femalecol"          :
+            standard.femaleColor = token[1]; break
+        case "Firstyear"          :
+            firstYear = token[1]; break
+        case "Lastyear"           :
+            lastYear = token[1]; break
+        case "Ageatbirth_male"    :
+            ageAtBirth_male = token[1]; break
+        case "Ageatbirth_female"  :
+            ageAtBirth_female = token[1]; break
+        case "Maxage_father"      :
+            maxAge_father = token[1]; break
+        case "Maxage_mother"      :
+            maxAge_mother = token[1]; break
+        case "Maxage"             :
+            maxAge = token[1]; break
+        case "Maxdelta_childs"    :
+            maxAgeDelta_childs = token[1]; break
+        case "Maxdelta_partners"  :
+            maxAgeDelta_partners = token[1]; break
+        case "Startid"            :
+            startid = token[1]; break
+        default                   :
+            console.log("invalid value : " + line)
         }
     }
 }
 function writeCSV(){         // write CSV files
-    print ("write CSV")
     var text = ""
     var nl = "\n"
     for ( var i in persons){
@@ -71,26 +85,36 @@ function writeCSV(){         // write CSV files
         text = text + ";" + person.birthDate + ";" + person.birthPlace
         text = text + ";" + person.christianDate + ";" + person.christianPlace
         text = text + ";" + person.deathDate + ";" + person.deathPlace + ";" + person.occupation
-        text = text + ";" + person.childOfFamily + ";" + person.parentInFamily
+        text = text + ";" + person.childOfFamily.pid
+        var x = ""
+        i="-1"
+        for ( i in person.parentInFamily) {
+            x = x + " " + person.parentInFamily[i].pid
+        }
+        text = text +  ";" + x
         text = text + ";" + person.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
-    var fileid = "file:///C:/Users/hans-/documents/myGeneal/p-autosave.csv"
-    // print(fileid)
+    var fileid = standard.path+"/p-autosave.csv"
     console.log(genealFile.fileExists(fileid))
 
     var x = genealFile.writeFile(fileid,text)
     //###########################################
     text = ""
-    for (i in families) {
+    for (var i in families) {
         var family = families[i]
-        text = text + family.pid + ";" + family.husband + ";" +family.wife + ";"
+        text = text + family.pid + ";" + family.husband.pid + ";" +family.wife.pid + ";"
         text = text + family.marriageDate + ";" + family.marriagePlace
         text = text + ";" + family.divorceDate + ";" + family.divorcePlace
-        text = text + ";" + family.children + ";"
-        text = text + family.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
+        x = ""
+
+        for ( i in family.children) {
+            x = x + " " + persons[i].pid
+        }
+        text = text +  ";" + x
+
+        text = text + ";"+ family.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
-    fileid = "file:///C:/Users/hans-/documents/myGeneal/f-autosave.csv"
-    // print(fileid)
+    fileid = standard.path+"/f-autosave.csv"
     console.log(genealFile.fileExists(fileid))
 
     x = genealFile.writeFile(fileid,text)
@@ -100,14 +124,26 @@ function readCSV_P(fileid){  // read CSV file Persons
     var text = genealFile.readFile(fileid)
     var nl = "\n"
     text  = text.split(nl)
-    print("Text :"+text+"*")
     var creatorP = Qt.createComponent("Person.qml")   // define factory for person
     var person = creatorP.createObject(appWindow)
+    var creatorF = Qt.createComponent("Family.qml")   // define factory for family
+
+    var person0 = creatorP.createObject(appWindow)     // empty person
+    person0.pid= "0"
+
+
+    var family0 = creatorF.createObject(appWindow)
+    family0.pid ="0"
+    family0.husband = person0
+    family0.wife = person0
+    person0.childOfFamily = family0
+
+    persons[0]=person0
 
     var CSV
     var x
 
-    persons.length = 0
+    //persons.length = 0
     unusedPersons.length = 0
 
 
@@ -117,36 +153,52 @@ function readCSV_P(fileid){  // read CSV file Persons
         person = creatorP.createObject(appWindow)
 
         person.pid = CSV[0]
-        if (person.pid=== -1){
-            unusedPersons.push(i)
-        }
         person.gender = CSV[1]
         person.givenName = CSV[2]
         person.surName  = CSV[3]
         person.birthDate  = CSV[4]
-        x = CSV[4].split(" ")
-        x =x[x.length-1]
-        person.birthYear = x
         person.birthPlace = CSV[5]
         person.christianDate = CSV[6]
         person.christianPlace = CSV[7]
         person.deathDate  = CSV[8]
-        x = CSV[8].split(" ")
-        x =x[x.length-1]
-        person.deathYear = x
         person.deathPlace  = CSV[9]
         person.occupation  = CSV[10]
-        person.childOfFamily = CSV[11]
-        x = CSV[12].split(",")
-        person.parentInFamily.length =0
-        for ( var j in x) {
-            person.parentInFamily.push(x[j])
+        var id = CSV[11]
+
+        if (id in families) var dummy = 1 //print("family ",id,"already defined")
+        else {   // print("new family FAMC",id)
+            var family = creatorF.createObject(appWindow)
+            family.pid = id
+            families[id] = family
+        }
+        person.childOfFamily =  families[id]
+
+        x = CSV[12].split(" ")
+        for ( var ii in x){
+            id =x[ii]
+            if (id in families)  dummy = 1 // print("family ",id,"already defined")
+            else {  // print("new family FAMS",id)
+                family = creatorF.createObject(appWindow)
+                family.pid = id
+                families[id] = family
+            }
+            person.parentInFamily[family.pid] = families[id]
         }
         person.note =  CSV[13].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
-        persons.push(person)
+        persons[person.pid]=person
+    }
+    for (  i in persons){
+        personsSort[i]= {
+            pid :  persons[i].pid,
+            yb: String(persons[i].yearOf(persons[i].birthDate)),
+            yd: String(persons[i].yearOf(persons[i].deathDate)),
+            gn: persons[i].givenName,sn: persons[i].surName,gender:persons[i].gender}
     }
 
-
+    personsSort.sort(function(a, b){return a.yb - b.yb});
+//    for (  i in personsSort){
+//    print(personsSort[i].yb,personsSort[i].yd,personsSort[i].gn,personsSort[i].sn,personsSort[i].gender)
+//}
     return
 
 }
@@ -162,7 +214,6 @@ function readCSV_F(fileid){  // read CSV file families
     var CSV
     var x
 
-    families.length = 0
 
     for (var i in  text) {
         if (text[i].length === 0 ) break
@@ -172,25 +223,25 @@ function readCSV_F(fileid){  // read CSV file families
         family = creatorF.createObject(appWindow)
 
         family.pid = CSV[0]
-        family.husband = CSV[1]
-        family.wife = CSV[2]
+        family.husband = persons[CSV[1]]
+        family.wife = persons[CSV[2]]
         family.marriageDate = CSV[3]
         family.marriagePlace = CSV[4]
         family.divorceDate = CSV[5]
         family.divorcePlace = CSV[6]
-        x = CSV[7].split(",")
-        for ( var j in x) {
-            family.children.push(x[j]) }
+        x = CSV[7].split(" ")
+        for ( var ii in x){
+            var id =x[ii]
+
+            family.children[family.pid] = persons[id]
+        }
+
         family.note = CSV[8].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
-        families.push(family)
+        families[family.pid]=family
     }
     return
 }
 function writeHtmlP1(){      // write html index file
-    print("starting writehtml")
-    // path = "C:/Users/hans-/mygeneal/Html/"
-    // toc = open(path + "index.html","wt+")
-
     //************************************
     for ( var i in persons){
         var person = persons[i]
@@ -234,10 +285,10 @@ function writeHtmlP1(){      // write html index file
     var sortedPersons = persons.slice()
 
     sortedPersons.sort(function(a, b) {
-        var gnameA = a.givenName.toUpperCase(); // ignore upper and lowercase
-        var gnameB = b.givenName.toUpperCase();
-        var snameA = a.surName.toUpperCase();
-        var snameB = b.surName.toUpperCase();
+        var gnameA = a.gn.toUpperCase(); // ignore upper and lowercase
+        var gnameB = b.gn.toUpperCase();
+        var snameA = a.sn.toUpperCase();
+        var snameB = b.sn.toUpperCase();
 
         if (snameA < snameB) {  return -1 }
         if (snameA > snameB) {  return 1  }
@@ -279,7 +330,7 @@ function writeHtmlP1(){      // write html index file
     text = text + "</body></html>" + nl
 
 
-    var fileid = "file:///C:/Users/hans-/documents/myGeneal/Html/index.html"
+    var fileid = standard.path +"/Html/index.html"
 
     var x = genealFile.writeFile(fileid,text)
 
@@ -396,9 +447,8 @@ function writeHtmlPers(i){   // write html person file
     text = text + "</html>" + nl
 
 
-    var fileid = "file:///C:/Users/hans-/documents/myGeneal/Html/" + person.pid +".html"
-       print(fileid)
-       console.log(genealFile.fileExists(fileid))
+    var fileid = standard.path + "/Html/" + person.pid +".html"
+    console.log(genealFile.fileExists(fileid))
 
     x = genealFile.writeFile(fileid,text)
 }

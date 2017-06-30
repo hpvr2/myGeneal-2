@@ -3,6 +3,8 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.0
 import "Gedcom.js" as Gedcom
+import "ExternalData.js" as External
+
 
 
 ApplicationWindow {
@@ -15,15 +17,16 @@ ApplicationWindow {
 
     property Item settings: SetInit {   }
 
-    property int actualId : 0
-    property int  actualFam : 0
+    property int actualId : 1
+    property int actualFam : 0
 
-    property int startIndi :0
+    property int startIndi :0   // TODO only for gedcom read
     property int startFam : 0
     property int startTrailer:0
 
 
-    property var persons :[]
+    property var persons :({})
+    property var personsSort : []
     property var families :[]
     property var trailer : []
 
@@ -35,23 +38,23 @@ ApplicationWindow {
     property Family family: null
     property Person person: null
 
-    property string selectType: "person"
+    property bool selectInit : true
+    property string selectCase: "person"
     property string selectGender: ""
     property string selectName : ""
-    property string childGen : "U"
+    property int selectFrom: standard.firstYear      //todo variable year
+    property int selectTo : standard.lastYear   // actual year
 
-    property int selectFrom: 0      //todo variable year
-    property int selectTo : 20+ Qt.formatDateTime(new Date(), "yyMMdd").substring(0,2)   // actual year
+
+    property int lastfamId : 0
+
 
     property string path : appWindow.settings.path
 
+    property var standard :  External.setInit()
 
     onClosing: {
-        print ("closing")
-        print( path )
-
         Gedcom.writeGedcom()
-        print("done")
     }
 
     ScrollView{

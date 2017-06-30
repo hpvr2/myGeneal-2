@@ -1,6 +1,5 @@
 // Gedcom : functions for reading and writing GEDCOM Files
 //*************************************************************************************
-//#####################################################
 function parseHEADER(a){           // Extract HEADER data from GEDCOM array "a"
 
     textEditHeader.clear()
@@ -20,13 +19,12 @@ function parseHEADER(a){           // Extract HEADER data from GEDCOM array "a"
         }
     }
 
-    var fileid = "file:///C:/Users/hans-/OneDrive/Data/header-data.ged"
+    var fileid = standard.path + "/header-data.ged"
     console.log(genealFile.fileExists(fileid))
 
     var x = genealFile.writeFile(fileid,text)
     return
 }
-//################################
 function parseTRAILER(a){          // Extract Trailer data from GEDCOM array "a"
 
     textEditTrailer.clear()
@@ -41,17 +39,27 @@ function parseTRAILER(a){          // Extract Trailer data from GEDCOM array "a"
 
     }
 
-    var fileid = "file:///C:/Users/hans-/OneDrive/Data/trailer-data.ged"
+    var fileid = standard.path + "/trailer-data.ged"
     console.log(genealFile.fileExists(fileid))
 
     var x = genealFile.writeFile(fileid,text)
     return
 }
-//#######################################################
 function parseINDI(a){             // Extract Person data from GEDCOM array "a"
     var creatorP = Qt.createComponent("Person.qml")   // define factory for person
+    var creatorF = Qt.createComponent("Family.qml")   // define factory for family
+
     var person = creatorP.createObject(appWindow)     // actual person
     var person0 = creatorP.createObject(appWindow)     // empty person
+    person0.pid= "0"
+
+    var family0 = creatorF.createObject(appWindow)
+    family0.pid ="0"
+    family0.husband = person0
+    family0.wife = person0
+    person0.childOfFamily = family0
+    person.childOfFamily = family0
+    persons[0]=person0
 
 
     var i = 0
@@ -61,7 +69,6 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
     var tempYear = ""
     var line
     var token = []
-    //    print("parseINDI " + startIndi)
     for ( var i1 = startIndi ; i1< a.length; i1++)  {     //  Read person Records
 
         line =a[i1].trim()
@@ -71,11 +78,6 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
             //            console.log ("start of FAMILY part , line : "+ i1 +": "+ line)
             startFam = i1
             // cleanup person note : splitNote(person.note)
-            for (var j = persons.length;j< person.pid;j++){
-                persons[j] = person0
-                persons[j].pid = -1
-//                print( j, " " ,persons[j].pid)
-            }
 
             persons[person.pid] = person       // store last person
             break
@@ -84,180 +86,213 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
             switch ( token[2] ){
             case "INDI" :{                              // next person Record found
                 var xx = token[1].match(/\d+/g)[0]      // temp person.pid
-                // cleanup person note
-//                print("add 0 from ",persons.length," to ",person.pid)
-                for (var j = persons.length;j< person.pid;j++){
-                    persons[j] = person0
-                    persons[j].pid = -1
-//                    print( j, " " ,persons[j].pid)
-                }
                 persons[person.pid] = person                    // store last person
-
                 person = creatorP.createObject(appWindow) // new person
                 person.pid = xx                           // use temp stored id
+                person.childOfFamily = family0
                 break
             }
             // ****************************************************************************************
             default : {
                 switch(token[1]){
-                case "GIVN" : {person.givenName  = line.substr(line.indexOf("GIVN")+5) ; break }
-                case "SURN" : {person.surName    = line.substr(line.indexOf("SURN")+5) ; break }
-                case "SEX"  : {person.gender     = line.substr(line.indexOf("SEX")+4)  ; break }
-                case "OCCU" : {person.occupation = line.substr(line.indexOf("OCCU")+5) ; break }
-
-                case "NOTE" : { person.note = line.substr(line.indexOf(token[1])+5);break}
-                case "CONC" : { person.note = person.note + line.substr(line.indexOf(token[1])+5);break}
-                case "CONT" : {
+                case "GIVN" :
+                    person.givenName  = line.substr(line.indexOf("GIVN")+5) ;
+                    break
+                case "SURN" :
+                    person.surName    = line.substr(line.indexOf("SURN")+5) ;
+                    break
+                case "SEX"  :
+                    person.gender     = line.substr(line.indexOf("SEX")+4)  ;
+                    break
+                case "OCCU" :
+                    person.occupation = line.substr(line.indexOf("OCCU")+5) ;
+                    break
+                case "NOTE" :
+                    person.note = line.substr(line.indexOf(token[1])+5);
+                    break
+                case "CONC" :
+                    person.note = person.note + line.substr(line.indexOf(token[1])+5);
+                    break
+                case "CONT" :
                     if (line.substr(line.indexOf("CONT")+5).length > 0){person.note = person.note + nl+ line.substr(line.indexOf("CONT")+5) }
                     break
-                }
 
-                case "FAMC" : { person.childOfFamily =  parseInt(token[2].match(/\d+/g))  ; break }
-                case "FAMS" : { person.parentInFamily.push(token[2].match(/\d+/g)) ; break } //TODO
+                case "FAMC" :
+                    var id =token[2].match(/\d+/g)[0]
+                    if (id in families) var dummy = 1 //print("family ",id,"already defined")
+                    else {   // print("new family FAMC",id)
+                        var family = creatorF.createObject(appWindow)
+                        family.pid = id
+                        families[id] = family
+                    }
+                    person.childOfFamily =  families[id]
+                    break
+                case "FAMS" :
+                    id =token[2].match(/\d+/g)[0]
+                    if (id in families)  dummy = 1 // print("family ",id,"already defined")
+                    else {  // print("new family FAMS",id)
+                        family = creatorF.createObject(appWindow)
+                        family.pid = id
+                        families[id] = family
+                    }
+                    person.parentInFamily[family.pid] = families[id]
+                    break  //TODO
 
-                case "BIRT" : {dateFlag = "birth"     ; break }
-                case "DEAT" : {dateFlag = "death"     ; break }
-                case "CHR"  : {dateFlag = "christian" ; break }
+                case "BIRT" :
+                    dateFlag = "birth"     ;
+                    break
+                case "DEAT" :
+                    dateFlag = "death"     ;
+                    break
+                case "CHR"  :
+                    dateFlag = "christian" ;
+                    break
 
-                case "DATE" : {                         // todo : add suport for sorted date
+                case "DATE" :                          // todo : add suport for sorted date
                     tempDate = line.substr(line.indexOf("DATE")+5)
-                    tempYear = tempDate.split(" ")
-                    tempYear =tempYear[tempYear.length-1]
                     switch(dateFlag ){
-                    case "birth" : {
+                    case "birth" :
                         person.birthDate = tempDate
-                        person.birthYear = tempYear
-                        break }
-                    case "christian" : {
+                        break
+                    case "christian" :
                         person.christianDate = tempDate
-                        break }
-                    case "death" : {
+                        break
+                    case "death" :
                         person.deathDate = tempDate
-                        person.deathYear = tempYear
-                        break }
+                        break
                     default : console.log("unkown dateFlag : "+dateFlag)
                     }
                     break
-                }
-                case "PLAC" : {
-                    switch(dateFlag ){
-                    case "birth" : { person.birthPlace = line.substr(line.indexOf("PLAC")+5) ; break }
-                    case "christian" : { person.christianPlace = line.substr(line.indexOf("PLAC")+5) ; break }
-                    case "death" : { person.deathPlace = line.substr(line.indexOf("PLAC")+5) ; break }
-                    default : console.log("unkown dateFlag : "+dateFlag)
-                    }
-                    break
-                }
 
-                case "NAME" : break                             // the NAME record is not used
-                default : console.log("unknown : "+line)
+                case "PLAC" :
+                    switch(dateFlag ){
+                    case "birth" :
+                        person.birthPlace = line.substr(line.indexOf("PLAC")+5)
+                        break
+                    case "christian" :
+                        person.christianPlace = line.substr(line.indexOf("PLAC")+5) ;
+                        break
+                    case "death" :
+                        person.deathPlace = line.substr(line.indexOf("PLAC")+5) ;
+                        break
+                    default :
+                        console.log("unkown dateFlag : "+dateFlag)
+                    }
+                    break
+
+
+                case "NAME" :
+                    break                             // the NAME record is not used
+                default :
+                    console.log("unknown : "+line)
                 }
             }
             }
         }
+
     }
-    for (var j = 0;j <=persons.length-1;j++){
-        print( j, " " ,persons[j].pid, " ",persons[j].givenName, " ",persons[j].surName)
-    }
-    print("end of parseINDI")
-    unusedPersons.length = 0
-    for ( i = 1; i <persons.length; i++) {
-        if ( persons[i].pid === -1 ){
-            unusedPersons.push(i)
-        }
-    }
-    print(unusedPersons)
-    return
 }
-//##############################################################################
 function parseFAM(a){              // Extract family data from GEDCOM array "a"
-    //     print("start of parseFAM")
 
     var creatorF = Qt.createComponent("Family.qml")   // define factory for family
     var family = creatorF.createObject(appWindow)     // actual family
     var family0 = creatorF.createObject(appWindow)     // actual family
+    family0.pid = "0"                        // use temp stored id
+    family0.husband = persons[0]
+    family0.wife = persons[0]
+    family.husband = persons[0]
+    family.wife = persons[0]
 
-    var i = 0
     var dateFlag = "none"
     var nl ="\n"
 
-    //    print("startFam "+startFam)
     // ****************************************************************************************
-    for ( var i1 = startFam ; i< a.length; i1++)  {     // third loop ; Read FAM Records
+    for ( var i1 = startFam ; i1< a.length; i1++)  {     // third loop ; Read FAM Records
 
         var line =a[i1].trim()
         var token = line.split(" ");
 
         if ( token[1] === "TRLR" || token[2] === "SOUR" ){   //end of FAM part
-            for (var j = families.length;j< family.pid;j++){
-                families[j] = family0
-               families[j].pid = -1
-//                print( j, " " ,persons[j].pid)
-            }
             families[family.pid] =family            // store last family
+            print("in db",families[family.pid].pid,families[family.pid].husband.pid)
+
             startTrailer = i1
 
             break
         }
         else{
             switch(token[2]){
-            case "FAM" :{                              // next family Record found
+            case "FAM" :                              // next family Record found
                 var xx = token[1].match(/\d+/g)[0]      // temp family.pid
-
-                for (var j = families.length;j< family.pid;j++){
-                    families[j] = family0
-                   families[j].pid = -1
-    //                print( j, " " ,persons[j].pid)
-                }
                 families[family.pid] =family            // store last family
-
                 family = creatorF.createObject(appWindow) // new person
                 family.pid = xx                           // use temp stored id
+                family.husband = persons[0]
+                family.wife = persons[0]
                 break
-            }
-            default : {
-                switch(token[1]){
-                case "HUSB" : {
-                    family.husband = token[2].match(/\d+/g)[0] ; break }
-                case "WIFE" : {
-                    family.wife = token[2].match(/\d+/g)[0] ; break }
-                case "CHIL"  :{family.children.push(token[2].match(/\d+/g)[0]) ; break }
-                case "MARR" : {dateFlag = "marriage" ; break }
-                case "DIV" : {dateFlag = "divorce" ; break }
 
-                case "NOTE" : { family.note = line.substr(line.indexOf(token[1])+5);break}
-                case "CONC" : { family.note = family.note + line.substr(line.indexOf(token[1])+5);break}
-                case "CONT" : {
+            default :
+
+                switch(token[1]){
+
+                case "HUSB" :
+                    var id = token[2].match(/\d+/g)[0]
+                    family.husband = persons[id]
+                    break
+                case "WIFE" :
+                    id =  token[2].match(/\d+/g)[0]
+                    family.wife = persons[id]
+                    break
+                case "CHIL"  :
+                    id = token[2].match(/\d+/g)[0]
+                    family.children[id] = persons[id]
+                    break
+                case "MARR" :
+                    dateFlag = "marriage" ;
+                    break
+                case "DIV" : dateFlag = "divorce"
+                    break
+
+                case "NOTE" :
+                    family.note = line.substr(line.indexOf(token[1])+5);
+                    break
+                case "CONC" :
+                    family.note = family.note + line.substr(line.indexOf(token[1])+5);
+                    break
+                case "CONT" :
                     if (line.substr(line.indexOf("CONT")+5).length > 0){ family.note = family.note + nl+ line.substr(line.indexOf("CONT")+5)}
                     break
-                }
-
-                case "DATE" : {                              // todo : add suport for sorted date
+                case "DATE" :                              // todo : add suport for sorted date
                     switch(dateFlag ){
-                    case "marriage" : { family.marriageDate = line.substr(line.indexOf("DATE")+5) ; break }
-                    case "divorce" : { family.divorceDate = line.substr(line.indexOf("DATE")+5) ; break }
-                    default : console.log("unkown dateFlag : "+dateFlag)
+                    case "marriage" :
+                        family.marriageDate = line.substr(line.indexOf("DATE")+5) ;
+                        break
+                    case "divorce" :
+                        family.divorceDate = line.substr(line.indexOf("DATE")+5) ;
+                        break
+                    default :
+                        console.log("unkown dateFlag : "+dateFlag)
                     }
                     break
-                }
-                case "PLAC" : {
+                case "PLAC" :
                     switch(dateFlag ){
-                    case "marriage" : { family.marriagePlace = line.substr(line.indexOf("PLAC")+5) ; break }
-                    case "divorce" : { family.divorcePlace = line.substr(line.indexOf("PLAC")+5) ; break }
-                    default : console.log("unkown dateFlag : "+dateFlag)
+                    case "marriage" :
+                        family.marriagePlace = line.substr(line.indexOf("PLAC")+5) ;
+                        break
+                    case "divorce" :
+                        family.divorcePlace = line.substr(line.indexOf("PLAC")+5) ;
+                        break
+                    default :
+                        console.log("unkown dateFlag : "+dateFlag)
                     }
                     break
+                default :
+                    console.log("unkown : "+line)
                 }
-                default :console.log("unkown : "+line)
-                }
-            }
             }
         }
     }
-
-    return //families
 }
-//##########################################################
 function writeNote(note){          // write a note in gedcom format
     var cmd = "1 NOTE "
 
@@ -284,10 +319,9 @@ function writeNote(note){          // write a note in gedcom format
     }
     return text
 }
-//#######################################
 function writeGedcom(){            // write GEDCOM file
 
-    var path = "file:///C:/Users/hans-/OneDrive/Data/testOutput.ged"
+    var path = standard.path + "/Data/testOutput.ged"
     var i = 0
     var text
     var nl = "\n"
@@ -370,12 +404,9 @@ function writeGedcom(){            // write GEDCOM file
     text = text + '0 @R1@ REPO\n'
     text = text + '1 NAME Euregio Familienbuch\n'
     text = text + '0 TRLR\n'
-    // print(text)                                                // store test file
-    var fileid = "file:///C:/Users/hans-/OneDrive/Data/all-test.ged"
-    // print(fileid)
+    var fileid = standard.path + "/all-test.ged"
     console.log(genealFile.fileExists(fileid))
 
     var x = genealFile.writeFile(fileid,text)
 
 }
-//######################################

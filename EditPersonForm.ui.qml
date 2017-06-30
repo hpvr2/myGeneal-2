@@ -7,8 +7,22 @@ import "Gedcom.js" as Gedcom
 
 Item {
     id: item1
+    width: 1000
+    property alias buttonAddPerson: buttonAddPerson
+    property alias textFieldSelectType: textFieldSelectType
+    property alias buttonShowAnchester: buttonShowAnchester
+    x: 0
+    y: 50
+    z: 2147483646
+    anchors.topMargin: 50
+    anchors.fill: parent
+
     
     property alias labelPid: labelPid
+    property alias labelOccupation: labelOccupation
+    property alias labelBorn: labelBorn
+
+
     property alias textFieldGivenName: textFieldGivenName
     property alias textFieldSurName: textFieldSurName
     property alias textFieldOccupation: textFieldOccupation
@@ -17,15 +31,20 @@ Item {
     property alias textFieldMarryPlace: textFieldMarryPlace
     property alias textFieldMarryDate: textFieldMarryDate
     property alias textFieldDeathDate: textFieldDeathDate
-    property alias buttonNextId: buttonNextId
     property alias textFieldBirthDate: textFieldBirthDate
     property alias textFieldBirthPlace: textFieldBirthPlace
     property alias textFieldDeathPlace: textFieldDeathPlace
+    property alias textFieldSelectName: textFieldSelectName
+    property alias textSelectionSurname: textSelectionSurname // rename
+    property alias textFieldSelection: textFieldSelection
+    property alias textFieldSelectTo: textFieldSelectTo
+    property alias textFieldSelectFrom: textFieldSelectFrom
+
+
+
     property alias textEditPnote: textEditPnote
 
-    //    property alias listViewPartners: listViewPartners
-    //    property alias listViewChilds: listViewChilds
-    //property alias mouseAreaParents: mouseAreaParents
+    property alias buttonNextId: buttonNextId
     property alias buttonOptions: buttonOptions
     property alias buttonDiscoParents: buttonDiscoParents
     property alias buttonDiscoPartner: buttonDiscoPartner
@@ -35,56 +54,43 @@ Item {
     property alias buttonAddNewPerson: buttonAddNewPerson
     property alias buttonDeletePerson: buttonDeletePerson
     property alias buttonShowDocs: buttonShowDocs
-    property alias buttonShowAnchesterTree: buttonShowAnchesterTree
-    property alias rectSelect: rectSelect
-    property alias radioButtonMale: radioButtonMale
-    property alias textFieldSelectName: textFieldSelectName
-    property alias textSelection: textSelection
-    
-    //    property alias buttonHide: buttonHide
-    
     property alias buttonNextFamily: buttonNextFamily
-    
+    property alias buttonWriteHtml: buttonWriteHtml
+    property alias buttonWriteGedcom: buttonWriteGedcom
+    property alias buttonAddStop: buttonAddStop
+    property alias buttonGender: buttonGender
+    property alias buttonSave: buttonSave
+    property alias buttonReadCSV: buttonReadCSV
+    property alias buttonReadGedcom: buttonReadGedcom
+
+
+    property alias rectSelect: rectSelect
     property alias rectPerson: rectPerson
-    property alias labelOccupation: labelOccupation
-    property alias textSelectionSurname: textSelectionSurname
-    
+    property alias rectOptions: rectOptions
+
+
+    property alias radioButtonMale: radioButtonMale
     property alias radioButtonUnknown: radioButtonUnknown
     property alias radioButtonFemale: radioButtonFemale
+
     
-    property alias rectOptions: rectOptions
+    
+    
+    
     property alias textWriteCSV: textWriteCSV
     property alias textWriteHtml: textWriteHtml
     property alias textEditHeader: textEditHeader
     property alias textEditTrailer: textEditTrailer
-    property alias buttonWriteHtml: buttonWriteHtml
-    property alias buttonWriteGedcom: buttonWriteGedcom
 
     property var header :[]
     
-    width: 1000
-    property alias buttonAddStop: buttonAddStop
-    property alias buttonAddDaughter: buttonAddDaughter
-    property alias buttonAddSon: buttonAddSon
-    property alias varSelect: varSelect
-    property alias buttonGender: buttonGender
+
     property alias tabViewSelect: tabViewSelect
     property alias tabViewChildren: tabViewChildren
     property alias tabViewPartners: tabViewPartners
     property alias tabViewParents: tabViewParents
-    property alias labelBorn: labelBorn
 
 
-    property alias buttonSave: buttonSave
-    property alias buttonReadCSV: buttonReadCSV
-    property alias buttonReadGedcom: buttonReadGedcom
-    property alias textFieldSelectTo: textFieldSelectTo
-    property alias textFieldSelectFrom: textFieldSelectFrom
-    x: 0
-    y: 50
-    z: 2147483646
-    anchors.topMargin: 50
-    anchors.fill: parent
 
     
     
@@ -98,7 +104,8 @@ Item {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
         
-        Rectangle{ id: rectangle; x: 8; y: -58; width: 985; height: 50; color: "#8f8787"; RowLayout{
+        Rectangle{ id: rectangle; x: 8; y: -58; width: 985; height: 50; color: "#8f8787";
+            RowLayout{
                 anchors.fill: parent
                 Button {
                     id: buttonNextId
@@ -143,7 +150,7 @@ Item {
                 }
                 
                 Button {
-                    id: buttonShowAnchesterTree
+                    id: buttonShowAnchester
                     text: qsTr("Show Anchestor Tree")
                 }
                 
@@ -155,18 +162,18 @@ Item {
 
             }
 
-            //row 4
 
             GridLayout {
                 id: gridLayout
                 x: 8
-                y: 84
-                width: 200
+                y: 40
+                width: 500
+                height: 300
                 rowSpacing: 27
                 anchors.left: parent.left
-                anchors.leftMargin: 8
+                anchors.leftMargin: 13
                 anchors.top: parent.top
-                anchors.topMargin: 84
+                anchors.topMargin: 56
                 visible: true
                 columnSpacing: 13
                 rows: 20
@@ -178,7 +185,11 @@ Item {
 
                 Label {
                     id: labelPid
-                    text: qsTr("Person Id :     ")
+                    x: 50
+                    y: 0
+                    width: 20
+                    height: 20
+                    text: qsTr(" Id :     ")
                     anchors.fill: parent
                     verticalAlignment: Text.AlignTop
                     horizontalAlignment: Text.AlignLeft
@@ -190,14 +201,12 @@ Item {
                     TextField {
                         id: textFieldGivenName
                         x: 100
-                        y: 0
+                        y: 4
                         width: 180
 
                         text: qsTr("* Givenname")
-                        anchors.verticalCenterOffset: 0
                         anchors.left: parent.left
-                        anchors.leftMargin: 101
-                        anchors.verticalCenter: labelParents.verticalCenter
+                        anchors.leftMargin: 74
                         Layout.preferredWidth: -1
                         Layout.minimumWidth: 200
 
@@ -207,11 +216,13 @@ Item {
                     TextField {
                         id: textFieldSurName
                         x: 500
-                        y: 0
+                        y: 1
                         width: 200
                         text: qsTr("*  Surname")
+                        anchors.verticalCenterOffset: -135
+                        anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 300
+                        anchors.leftMargin: 273
                         Layout.minimumWidth: 200
                         Layout.columnSpan: 1
                     }
@@ -284,19 +295,21 @@ Item {
                 Label {
                     id: labelBorn
                     text: qsTr("Born :     ")
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     Layout.column: 1
                     Layout.row : 4
                     Layout.columnSpan: 1
-                    Layout.fillWidth: false
+                    Layout.fillWidth: true
 
                     TextField {
                         id: textFieldBirthDate
                         y: -4
                         width: 130
                         text: qsTr("*  Birthdate")
+                        anchors.verticalCenterOffset: 0
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 100
+                        anchors.leftMargin: 63
                     }
 
                     TextField {
@@ -307,14 +320,14 @@ Item {
                         anchors.verticalCenterOffset: 0
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 302
+                        anchors.leftMargin: 263
                         Layout.columnSpan: 2
                     }
                 }
 
                 Label {
                     id: labelDied
-                    text: qsTr("Died : ")
+                    text: qsTr("Died ( Age ) :")
                     Layout.column: 1
                     Layout.row : 5
                     Layout.columnSpan: 1
@@ -324,9 +337,10 @@ Item {
                         y: -122
                         width: 130
                         text: qsTr("*  Deathdate")
+                        anchors.verticalCenterOffset: 0
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 100
+                        anchors.leftMargin: 63
                         Layout.columnSpan: 1
                     }
 
@@ -335,9 +349,10 @@ Item {
                         y: 22
                         width: 200
                         text: qsTr("*  Deathplace")
+                        anchors.verticalCenterOffset: 0
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 300
+                        anchors.leftMargin: 263
                         Layout.columnSpan: 1
                     }
                 }
@@ -355,8 +370,9 @@ Item {
                         y: 54
                         width: 130
                         text: qsTr("*  Marrydate")
+                        anchors.verticalCenterOffset: -4
                         anchors.left: parent.left
-                        anchors.leftMargin: 100
+                        anchors.leftMargin: 60
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -366,8 +382,9 @@ Item {
                         width: 198
                         height: 20
                         text: qsTr("*  Marryplace")
+                        anchors.verticalCenterOffset: -4
                         anchors.left: parent.left
-                        anchors.leftMargin: 300
+                        anchors.leftMargin: 262
                         anchors.verticalCenter: parent.verticalCenter
                         Layout.columnSpan: 2
                     }
@@ -450,7 +467,7 @@ Item {
                             anchors.left: parent.left
                             Layout.rowSpan: 1
                             anchors.topMargin: 30
-                            anchors.leftMargin: 66
+                            anchors.leftMargin: 50
                             model: partners
                         }
 
@@ -516,7 +533,7 @@ Item {
                                 anchors.left: parent.left
                                 Layout.rowSpan: 1
                                 anchors.topMargin: 30
-                                anchors.leftMargin: 66
+                                anchors.leftMargin: 50
                                 model: childs
                             }
                         }
@@ -527,15 +544,15 @@ Item {
                     id: labelDivorced
                     width: 85
                     height: 13
-                    text: qsTr("   Divorced")
+                    text: qsTr("    Divorced")
                     Layout.rowSpan: 1
                     Layout.columnSpan: 2
                     Layout.row : 7
 
                     TextField {
                         id: textFieldDivorceDate
-                        x: 124
-                        y: 0
+                        x: 73
+                        y: -3
                         width: 130
                         height: 20
                         text: qsTr("*  Divorcedate")
@@ -547,9 +564,9 @@ Item {
                         width: 198
                         height: 20
                         text: qsTr("*  Divorceplace")
-                        anchors.verticalCenterOffset: 3
+                        anchors.verticalCenterOffset: 0
                         anchors.left: parent.left
-                        anchors.leftMargin: 310
+                        anchors.leftMargin: 271
                         anchors.verticalCenter: parent.verticalCenter
                         Layout.columnSpan: 1
                     }
@@ -557,7 +574,7 @@ Item {
 
                 Label {
                     id: labelOccupation
-                    text: qsTr("      Occupation")
+                    text: qsTr("    Occupation")
                     Layout.rowSpan: 1
                     Layout.columnSpan: 2
                     Layout.row : 9
@@ -566,10 +583,11 @@ Item {
 
                     TextField {
                         id: textFieldOccupation
-                        x: 118
+                        x: 73
                         y: -7
                         width: 400
                         text: qsTr("*  Occupation")
+                        anchors.verticalCenterOffset: 0
                         anchors.verticalCenter: parent.verticalCenter
                         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                         Layout.rowSpan: 1
@@ -588,8 +606,8 @@ Item {
 
                     Button {
                         id: buttonGender
-                        x: 117
-                        y: -5
+                        x: 89
+                        y: 1
                         text: qsTr("Select Gender")
                         checked: true
                         checkable: true
@@ -644,7 +662,7 @@ Item {
         visible: false
 
         Text {
-            id: textSelection
+            id: textFieldSelection
             x: 0
             text: qsTr("Please Enter options to restrict the search")
             verticalAlignment: Text.AlignVCenter
@@ -661,7 +679,7 @@ Item {
             visible: true
 
             Text {
-                id: varSelect
+                id: textFieldSelectType
                 x: 253
                 text: qsTr("* person/child/partner/parent")
                 anchors.top: parent.top
@@ -690,24 +708,60 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 170
 
-                    RadioButton {
-                        id: radioButtonMale
-                        y: -358
-                        text: qsTr("Male")
-                        anchors.left: parent.left
-                        anchors.leftMargin: 200
-                        anchors.verticalCenter: parent.verticalCenter
-                        checked: false
-                        enabled: true
-                        //autoExclusive: false
-                    }
-
                     Button {
-                        id: buttonAddSon
+                        id: buttonAddPerson
                         x: 275
                         y: 5
-                        text: qsTr("add son")
+                        text: qsTr("add new person")
                         anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    GroupBox {
+                        id: genderBox
+                        x: 173
+                        width: 100
+                        height: 200
+                        checked: false
+                        checkable: false
+                        anchors.top: parent.top
+                        anchors.topMargin: -5
+                        anchors.right: parent.right
+                        anchors.rightMargin: -100
+                        title: qsTr("    Select gender")
+                        ExclusiveGroup{id: genderSelection}
+                        RadioButton {
+                            id: radioButtonMale
+                            x: 10
+                            text: qsTr("Male")
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: parent.left
+                            anchors.leftMargin: 20
+
+                            exclusiveGroup: genderSelection
+                        }
+
+                        RadioButton {
+                            id: radioButtonFemale
+                            x: 400
+                            text: qsTr("Female")
+                            anchors.top: parent.top
+                            anchors.topMargin: 25
+                            exclusiveGroup: genderSelection
+                            anchors.left: parent.left
+                            anchors.leftMargin: 20
+                        }
+
+                        RadioButton {
+                            id: radioButtonUnknown
+                            x: 400
+                            text: qsTr("Unknown")
+                            anchors.top: parent.top
+                            anchors.topMargin: 50
+                            exclusiveGroup: genderSelection
+                            anchors.left: parent.left
+                            anchors.leftMargin: 20
+                        }
                     }
                 }
             }
@@ -733,26 +787,6 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.horizontalCenter
                     anchors.leftMargin: 119
-
-                    RadioButton {
-                        id: radioButtonFemale
-                        x: -914
-                        y: 170
-                        text: qsTr("Female")
-                        anchors.verticalCenterOffset: -6
-                        anchors.verticalCenter: parent.verticalCenter
-                        //autoExclusive: false
-                        anchors.left: parent.left
-                        anchors.leftMargin: 200
-                    }
-
-                    Button {
-                        id: buttonAddDaughter
-                        x: 275
-                        y: -1
-                        text: qsTr("add daughter")
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
                 }
             }
 
@@ -775,22 +809,11 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 170
 
-                    RadioButton {
-                        id: radioButtonUnknown
-                        x: 141
-                        y: 255
-                        text: qsTr("Unknown")
-                        anchors.verticalCenter: parent.verticalCenter
-                        //autoExclusive: false
-                        anchors.left: parent.left
-                        anchors.leftMargin: 200
-                    }
-
                     Button {
                         id: buttonAddStop
                         x: 275
                         y: 2
-                        text: qsTr("Abort")
+                        text: qsTr("Stop Selection")
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -800,6 +823,10 @@ Item {
                 id: tabViewSelect
                 width: 400
                 height: 300
+                selectionMode: 0
+                sortIndicatorVisible: false
+                sortIndicatorOrder: -1
+                sortIndicatorColumn: 0
                 anchors.left: textSelectionTo.right
                 anchors.leftMargin: -20
                 anchors.top: textSelectionTo.bottom
