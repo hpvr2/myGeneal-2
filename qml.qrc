@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>Gedcom.js</file>
+        <file>Person.qml</file>
+        <file>SetInit.qml</file>
+        <file>Family.qml</file>
+        <file>EditPage.js</file>
+        <file>ExternalData.js</file>
+        <file>EditPerson.qml</file>
+        <file>EditPersonForm.ui.qml</file>
+    </qresource>
+</RCC>
