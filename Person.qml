@@ -22,34 +22,58 @@ Item {                                          // Definition of a person object
 
     property string note  : ""
 
-    property var childOfFamily                   //todo : use object directly
-    property var parentInFamily : ({})               //todo : use object directly
+    property string childOfFamily : ""                  //todo : use object directly
+    property var parentInFamily : []               //todo : use object directly
 
 
     function prt(text){    // print person main data
         if (text==="") text="person"
-        print(text,pid,givenName,surName,"FAMC",childOfFamily.pid,"FAMS")
- //       for (var i in parentInFamily){print("Partner Family",parentInFamily[i].pid)}
+        print(text,pid,givenName,surName,"FAMC",childOfFamily,"FAMS",parentInFamily)
     }
 
-//    function father(){   // return father-person
-//        if ( childOfFamily === 0 ) return( persons[0])
-//        return(persons[families[childOfFamily].husband])
-//    }
-//    function mother(){   // return mother-person
-//        if ( childOfFamily === 0 ) return( persons[0])
-//        return(persons[families[childOfFamily].wife])
-//    }
+    function father(){   // return father-person
+        if ( childOfFamily === "") return( persons[0])
+        return(persons[families[childOfFamily].husband])
+    }
+    function mother(){   // return mother-person
+        if ( childOfFamily === ""  ) return( persons[0])
+        return(persons[families[childOfFamily].wife])
+    }
     function age(){
-        var yb = yearOf(birthDate)
-        if (isNaN(yb)) yb = -1
-        var yd = yearOf(deathDate)
-        if (isNaN(yd)) yd = -1
-        if (yb === -1) return("* unknown *")
-        if (yd === -1) yd = 2017   // todo
+        var yb = birthYear()
+        var yd = deathYear()
+        if (yb === 0) return("* unknown *")
+        if (yd === 0) yd = 2017   // todo
         if ((yd-yb) > standard.maxAge) return("* assumed dead *")
         else return (String(yd - yb))
     }
+    function birthYearStr(){
+        var tempYear = " " + birthDate
+        tempYear = tempYear.split(" ")
+        tempYear =tempYear[tempYear.length-1]
+        if (isNaN(tempYear) | tempYear ==="") return( "9999" )
+        else return (tempYear)
+    }
+    function deathYearStr(){
+        var tempYear = " " + deathDate
+        tempYear = tempYear.split(" ")
+        tempYear =tempYear[tempYear.length-1]
+        if (isNaN(tempYear) | tempYear ==="") return( "----" )
+        else return (tempYear)
+    }
+    function birthYear(){
+        var tempYear = birthDate.split(" ")
+        tempYear =tempYear[tempYear.length-1]
+        if (isNaN(tempYear) | tempYear ==="") return( 0 )
+        else return(parseInt(tempYear))
+    }
+    function deathYear(){
+        var tempYear = deathDate.split(" ")
+        tempYear =tempYear[tempYear.length-1]
+        if (isNaN(tempYear) | tempYear ==="") return( 0 )
+        else return(parseInt(tempYear))
+    }
+
     function yearOf(gedDate){
         var tempYear = gedDate.split(" ")
         tempYear =tempYear[tempYear.length-1]

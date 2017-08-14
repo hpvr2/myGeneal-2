@@ -7,7 +7,10 @@ import "Gedcom.js" as Gedcom
 
 Item {
     id: item1
-    width: 1000
+    width: 1200
+    property alias buttonCloseOptions: buttonCloseOptions
+    property alias textWriteGedcom: textWriteGedcom
+    property alias textAge: textAge
     property alias buttonAddPerson: buttonAddPerson
     property alias textFieldSelectType: textFieldSelectType
     property alias buttonShowAnchester: buttonShowAnchester
@@ -60,7 +63,6 @@ Item {
     property alias buttonAddStop: buttonAddStop
     property alias buttonGender: buttonGender
     property alias buttonSave: buttonSave
-    property alias buttonReadCSV: buttonReadCSV
     property alias buttonReadGedcom: buttonReadGedcom
 
 
@@ -77,12 +79,12 @@ Item {
     
     
     
-    property alias textWriteCSV: textWriteCSV
     property alias textWriteHtml: textWriteHtml
     property alias textEditHeader: textEditHeader
     property alias textEditTrailer: textEditTrailer
 
     property var header :[]
+    property var trailer :[]
     
 
     property alias tabViewSelect: tabViewSelect
@@ -120,6 +122,7 @@ Item {
                     width: 100
                     height: 19
                     text: qsTr("previous person")
+                    enabled: false
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.columnSpan: 1
                 }
@@ -152,6 +155,7 @@ Item {
                 Button {
                     id: buttonShowAnchester
                     text: qsTr("Show Anchestor Tree")
+                    enabled: false
                 }
                 
                 Button {
@@ -289,6 +293,7 @@ Item {
 
                         }
 
+
                     }
                 }
 
@@ -327,7 +332,7 @@ Item {
 
                 Label {
                     id: labelDied
-                    text: qsTr("Died ( Age ) :")
+                    text: qsTr("Died  :")
                     Layout.column: 1
                     Layout.row : 5
                     Layout.columnSpan: 1
@@ -354,6 +359,14 @@ Item {
                         anchors.left: parent.left
                         anchors.leftMargin: 263
                         Layout.columnSpan: 1
+                    }
+
+                    Text {
+                        id: textAge
+                        x: 63
+                        y: 22
+                        text: qsTr("estimated age")
+                        font.pixelSize: 12
                     }
                 }
 
@@ -416,13 +429,13 @@ Item {
 
                             Button {
                                 id: buttonDiscoPartner
-                                width: 144
+                                width: 170
                                 height: 17
-                                text: qsTr("disconnect from partner")
+                                text: qsTr("disconnect from ACTUAL partner")
                                 anchors.verticalCenterOffset: 0
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
-                                anchors.leftMargin: 164
+                                anchors.leftMargin: 166
                                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                                 Layout.columnSpan: 1
                                 enabled: true
@@ -874,117 +887,165 @@ Item {
 
     Rectangle {
         id: rectOptions
+        height: 1000
+        anchors.rightMargin: -87
+        anchors.bottomMargin: 17
+        anchors.leftMargin: 87
+        anchors.topMargin: -17
         anchors.fill: parent
 
         visible: true
 
-        GridLayout {
-            id: gridLayout1
-            anchors.rightMargin: 0
-            anchors.bottomMargin: 0
-            anchors.leftMargin: 0
-            anchors.topMargin: 0
-            rows: 8
-            columns: 2
-            anchors.fill: parent
-
-            Button {
-                id: buttonReadCSV
-                width: 150
-                height: 40
-                text: qsTr("Read autosave data")
-                z: 2
-                checked: false
-                clip: false
-                checkable: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Text {
-                id: textReadGedcom
-                text: qsTr("Read autosave data and restart")
-                font.pixelSize: 16
-            }
-
-            Button {
-                id: buttonReadGedcom
-                width: 150
-                height: 40
-                text: qsTr("Read Gedcom  File")
-                z: 2
-                checked: false
-                clip: false
-                checkable: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Text {
-                id: textReadGedcom1
-                text: qsTr("Read external Gedcom file and start processing")
-                font.pixelSize: 16
-            }
-
-            Button {
-                id: buttonWriteGedcom
-                width: 150
-                height: 40
-                text: qsTr("Write Gedcom  File")
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                clip: false
-                z: 2
-                checked: false
-                checkable: true
-            }
-
-
-
-            Text {
-                id: textWriteCSV
-                text: qsTr("Write  internal CSV file ( autosave ) ")
-                font.pixelSize: 16
-            }
-
-
-
-
-            Button {
-                id: buttonWriteHtml
-                width: 150
-                height: 40
-                text: qsTr("Write HTML  Files  ")
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.fillWidth: false
-                visible: true
-                checkable: true
-                z: 2
-                checked: false
-            }
-
-            Text {
-                id: textWriteHtml
-                text: "Write HTML Files ( TODO )"
-                font.pixelSize: 16
-            }
-
-            TextEdit {
-                id: textEditHeader
-                width: 300
-                height: 200
-                text: qsTr("Header :")
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                font.pixelSize: 12
-            }
-
-            TextEdit {
-                id: textEditTrailer
-                width: 300
-                height: 200
-                text: qsTr("Trailer :")
-                font.pixelSize: 12
-            }
-
+        Button {
+            id: buttonReadGedcom
+            x: 43
+            width: 150
+            height: 40
+            text: qsTr("Read Gedcom  File")
+            anchors.top: parent.top
+            anchors.topMargin: 20
+            z: 2
+            clip: false
+            checkable: true
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
+
+        Text {
+            id: textWriteHtml
+            x: 415
+            y: 406
+            text: "Write HTML Files"
+            font.pixelSize: 16
+        }
+
+        Button {
+            id: buttonWriteHtml
+            x: 48
+            y: 385
+            width: 150
+            height: 40
+            text: qsTr("Write HTML  Files  ")
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.fillWidth: false
+            visible: true
+            checkable: false
+            z: 2
+        }
+
+
+        Text {
+            id: textWriteGedcom
+            x: 393
+            y: 82
+            text: qsTr("Write external GEDCOM file ")
+            anchors.verticalCenterOffset: 1
+            anchors.right: buttonWriteGedcom.left
+            anchors.rightMargin: -548
+            anchors.verticalCenter: buttonWriteGedcom.verticalCenter
+            font.pixelSize: 16
+        }
+        Button {
+            id: buttonWriteGedcom
+            y: 71
+            width: 150
+            height: 40
+            text: qsTr("Write Gedcom  File")
+            anchors.bottom: buttonReadGedcom.top
+            anchors.bottomMargin: -91
+            anchors.left: buttonReadGedcom.right
+            anchors.leftMargin: -150
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            clip: false
+            z: 2
+            checked: false
+            checkable: true
+        }
+
+        Text {
+            id: textReadGedcom1
+            x: 393
+            y: 48
+            text: qsTr("Read external Gedcom file and start processing")
+            anchors.verticalCenterOffset: 11
+            anchors.verticalCenter: buttonReadGedcom.verticalCenter
+            anchors.right: buttonReadGedcom.left
+            anchors.rightMargin: -681
+            font.pixelSize: 16
+        }
+
+        Text {
+            id: text2
+            y: 139
+            text: qsTr("GEDCOM Trailer")
+            anchors.verticalCenterOffset: -4
+            anchors.left: parent.left
+            anchors.leftMargin: 398
+            anchors.verticalCenter: text1.verticalCenter
+            font.pixelSize: 12
+        }
+
+        Text {
+            id: text1
+            x: 43
+            y: 132
+            text: qsTr("GEDCOM Header")
+            anchors.bottom: buttonWriteGedcom.top
+            anchors.bottomMargin: -74
+            font.pixelSize: 12
+        }
+
+        TextEdit {
+            id: textEditHeader
+            x: 48
+            y: 180
+            width: 300
+            height: 200
+            text: qsTr("")
+            anchors.top: parent.top
+            anchors.topMargin: 159
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            font.pixelSize: 12
+        }
+
+        TextEdit {
+            id: textEditTrailer
+            x: 398
+            y: 180
+            width: 300
+            height: 200
+            text: qsTr("")
+            anchors.verticalCenter: textEditHeader.verticalCenter
+            anchors.right: textEditHeader.left
+            anchors.rightMargin: -650
+            font.pixelSize: 12
+        }
+
+        Button {
+            id: buttonCloseOptions
+            x: 48
+            y: 443
+            text: qsTr("Close Option Window")
+            visible: true
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        }
+
+        Text {
+            id: textClose
+            x: 415
+            y: 443
+            text: "Close options window"
+            font.pixelSize: 16
+        }
+
+
+
+
+
     }
+
+
+
+
 
 
 

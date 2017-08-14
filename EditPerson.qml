@@ -10,18 +10,36 @@ import "ExternalData.js" as External
 
 
 EditPersonForm {
+    buttonCloseOptions.onClicked: {
+        header   = textEditHeader.text
+        trailer = textEditTrailer.text
+        rectOptions.visible= false
+        rectPerson.visible=true
+    }
+
 
 
     anchors.fill: parent
 
     Component.onCompleted: {             // startup : read CSV or switch to options
-        print("startup, check csv")
         var fileid1 = standard.path +"/p-autosave.csv"
         var fileid2 = standard.path +"/f-autosave.csv"
-        print(fileid1)
         if (genealFile.fileExists(fileid1) === true && genealFile.fileExists(fileid2) === true) {
             External.readCSV_P(fileid1)
             External.readCSV_F(fileid2)
+
+            var fileid = standard.path + "/header-data.ged"
+            console.log(genealFile.fileExists(fileid))
+
+            var x = genealFile.readFile(fileid)
+            textEditHeader.append(x)
+
+            fileid = standard.path + "/trailer-data.ged"
+            console.log(genealFile.fileExists(fileid))
+
+            x = genealFile.readFile(fileid)
+            textEditTrailer.append(x)
+
             rectOptions.visible=false
         }
         else {
@@ -36,12 +54,11 @@ EditPersonForm {
 
     buttonAddStop.onClicked: {           // stop selection screen
         rectSelect.visible= false
-        print("selection stopped")
     }
     buttonDiscoParents.onClicked: {      // disconnect parents
         persons[actualId].prt()
         msgDiscoParents(persons[actualId])
-}
+    }
     buttonAddPerson.onClicked: {       // add new person
         rectSelect.visible= false
         if ( radioButtonFemale.checked === true ) EditPage.addPerson("F",persons[actualId].surName)
@@ -50,7 +67,10 @@ EditPersonForm {
             else EditPage.addPerson("",persons[actualId].surName)
         }
     }
+    buttonDiscoPartner.onClicked: {
+        msgDiscoFamily()
 
+    }
     radioButtonFemale.onClicked: {       // filter selection on females
 
         selectGender = "F"
@@ -114,6 +134,7 @@ EditPersonForm {
     }
     buttonNextFamily.onClicked: {         // switch to next partner family
         person = persons[actualId]
+        person.prt("nextFam")
         actualFam = actualFam + 1
         EditPage.setRelatives(actualId)
     }
@@ -135,11 +156,11 @@ EditPersonForm {
     }
     buttonNextId.onClicked: {             // switch to next ( sequential )pid
 
-        for  (var i= actualId+1;i<persons.length;i++){
+        for  (var i= actualId+1;i<maxid;i++){
             if  (persons[i].pid === -1 )continue
             else {actualId = i;break}
         }
-        if (actualId===persons.length-1) actualId = 1
+        if (actualId===maxid-1) actualId = 1
         actualFam = 0
         EditPage.setRelatives(actualId)
     }
@@ -154,64 +175,59 @@ EditPersonForm {
 
     tabViewChildren.onClicked: {          // switch to child or display child selection
         var p1 = childs.get(row)
-        if  (p1.pid === -1)   // new child
-        {
-            rectSelect.visible= true
-            print("TODO : use fathers name as default")
+        if  (p1.pid === "-1")   // new child
+        {   rectSelect.visible= true
             EditPage.select("child","",persons[actualId].surName,
-                            parseInt(persons[actualId].yearOf(persons[actualId].birthDate)+14),
-                            parseInt(persons[actualId].yearOf(persons[actualId].birthDate)+50))
-
+                            persons[actualId].birthYear()+14,
+                            persons[actualId].birthYear()+50)
         }
         else                  // existing person
-        {
-            actualId = p1.pid
+        {  actualId = p1.pid
             actualFam = 0
-
         }
         EditPage.setRelatives(actualId)
     }
     tabViewPartners.onClicked: {          // switch to partner or display partner selection ( TODO )
-        print(" TODO : switch to partner or display partner selection ")
         var p1 = partners.get(row)
         selectGender = "M"
-        if  (p1.pid === -1)   // new partner
+        if  (p1.pid === "-1")   // new partner
         {
-            rectSelect.visible= true
-            var genderSelect = "M"
-            if (persons[actualId].gender === "M") genderSelect = "F"
+            lastId = actualId
 
-            EditPage.select("partner",genderSelect,persons[actualId].surName,
-                            parseInt(persons[actualId].birthYear)-40,
-                            parseInt(persons[actualId].birthYear)+50)
+            rectSelect.visible= true
+            if (persons[actualId].gender === "M") selectGender = "F"
+            EditPage.select("partner",selectGender,"",
+                            persons[actualId].birthYear()-20,
+                            persons[actualId].birthYear()+20)
         }
         else {
             actualId = p1.pid
             actualFam = 0
+            persons[actualId].prt("partner selected, before set")
             EditPage.setRelatives(actualId)
         }
     }
     tabViewParents.onClicked: {           // switch to parent or display parent selection ( TODO )
-        print(" switch to parent or display parent selection ( TODO )")
         var p1 = parents.get(row)
         switch(p1.pid )  {
         case "-1" : {// father
             rectSelect.visible= true
             EditPage.select("parent","M",persons[actualId].surName,
-                            parseInt(persons[actualId].birthYear)-40,
-                            parseInt(persons[actualId].birthYear)-15)
+                            persons[actualId].birthYear()-40,
+                            persons[actualId].birthYear()-15)
             break
         }
         case "-2" : {
             rectSelect.visible= true
             EditPage.select("parent","F","",
-                            parseInt(persons[actualId].birthYear)-40,
-                            parseInt(persons[actualId].birthYear)-15)
+                            persons[actualId].birthYear()-40,
+                            persons[actualId].birthYear()-15)
             break
         }
         default : {
             actualId = p1.pid
             actualFam = 0
+            persons[actualId].prt("parent selected, before set")
             EditPage.setRelatives(actualId)
         }}
     }
@@ -234,24 +250,21 @@ EditPersonForm {
                 EditPage.setRelatives(actualId)
             }
             else {
-               msgDiscoParents(persons[actualId])
+                msgDiscoParents(persons[actualId])
             }
             break
 
         case "parent" :
             persons[actualId].prt()
-            print("TODO : disconnect function before select parents")
             break
 
         case "partner" :
-            persons[actualId].prt()
-            print("TODO : disconnect function before select partner")
+            persons[actualId].prt("select partner")
+            msgNewFamily(lastId,actualId)
             break
 
         }
         EditPage.setRelatives(actualId)
-
-
     }
 
     MessageDialog{                        // message box
@@ -261,23 +274,44 @@ EditPersonForm {
         detailedText: "initial"
         standardButtons: StandardButton.Yes | StandardButton.No
         Component.onCompleted: visible = false
-        onYes: {print(this.title)
+        onYes: {
             if ( this.title === "Select child" ) { print("assuming Male"); p1 = "M"}
             if ( this.title === "Disconnect from parents ?" ) {
                 EditPage.discoParents(actualId)
-                if ( selectCase === "child" ) EditPage.connParents(actualId,partnerFamily.pid)
+                if ( selectCase === "child" ) EditPage.connParents(actualId,family.pid)
                 EditPage.setRelatives(actualId)
 
             }
+            if ( this.title === "Create new family ?" ) {
+                EditPage.addFamily (lastId,actualId)
+                EditPage.setRelatives(actualId)
 
-            if ( this.title === "Delete person" ) { print("action delete person")}
+            }
+            if ( this.title === "Delete family ?" ) {
+                EditPage.deleteFamily()
+                EditPage.setRelatives(actualId)
+
+            }
+            if ( this.title === "Delete person" ) {
+                person= persons[actualId]
+                var i = families[person.childOfFamily].children.indexOf(person.pid)
+                families[person.childOfFamily].children.splice(i,1)
+                for (var id in person.parentInFamily){
+                    if (person.gender === "M") families[person.parentInFamily[id]].husband = ""
+                    else families[person.parentInFamily[id]].wife = ""
+                    unusedPersons.push(actualId)
+                }
+                persons[person.id]= persons[0]
+            }
             if ( this.title === "initial" )       { print("unkown message dialog : "+this.title)}
 
         }
         onNo: {print("NO pressed for : "+this.title)
             if ( this.title === "Select child" ) { print("assuming Female"); p1 = "F"}
             if ( this.title === "Disconnect from parents ?" ) {
-                print("dont Disconnect from parents ?")
+
+            }
+            if ( this.title === "Create new family ?" ) {
 
             }
         }
@@ -286,6 +320,18 @@ EditPersonForm {
 
         }
     }
+
+    function msgDiscoFamily(){
+        var nl = "\n"
+        msgBox.title = "Delete family ?"
+        msgBox.text = "Delete family : " + persons[families[actualFamId].husband].givenName
+                + " " + persons[families[actualFamId].husband].surName
+                + " & " +                  persons[families[actualFamId].wife].givenName + " "
+                + persons[families[actualFamId].wife].surName
+                + nl +"           and " +families[actualFamId].children.length + " children "+" ? "
+        msgBox.detailedText = " Disconnect both partners & children from family, delete family"
+        msgBox.visible = true
+    }
     function msgDiscoParents(p1){
         msgBox.title = "Disconnect from parents ?"
         msgBox.text = p1.father().givenName + " " + p1.father().surName + " & "
@@ -293,7 +339,13 @@ EditPersonForm {
         msgBox.detailedText = " TODO : detail text"
         msgBox.visible = true
     }
-
+    function msgNewFamily(){
+        msgBox.title = "Create new family ?"
+        msgBox.text = "New family : " + persons[lastId].givenName + " " + persons[lastId].surName
+                + " & " + persons[actualId].givenName + " " + persons[actualId].surName +" ? "
+        msgBox.detailedText = " Create new family and connect hasband & wife"
+        msgBox.visible = true
+    }
     // Option Buttons
 
     buttonWriteHtml.onClicked: {          // write html files ( TODO )
@@ -302,27 +354,29 @@ EditPersonForm {
     buttonSave.onClicked: {               // save screen data & write CSV
         EditPage.saveScreen()
         External.writeCSV()
-    }
-    buttonReadCSV.onClicked: {            // read CSV data ( is this necessary ? )
-
-        var fileid = standard.path+"/p-autosave.csv"
-        External.readCSV_P(fileid)
-
-        fileid = standard.path+"/f-autosave.csv"
-        External.readCSV_F(fileid)
-        rectOptions.visible=false
-
+//        External.writeHeader()
+//        External.writeTrailer()
     }
     buttonWriteGedcom.onClicked: {        // write GEDCOM file
-
         Gedcom.writeGedcom()
     }
     buttonReadGedcom.onClicked: {         // read GEDCOM file ( TODO : cleabup before reading )
         fileDialog.visible = true
         rectOptions.visible = false
-
+    }
+    buttonShowDocs.onClicked: {
+        docsDialog.folder = standard.path + "/Archiv/" + actualId
+        docsDialog.visible = true
     }
 
+    FileDialog {                          // file dialog for show documents
+        id: docsDialog
+        title: "Show Personal Documents"
+        onAccepted: {
+            Qt.openUrlExternally(fileUrls)
+        }
+        onRejected: { console.log("Canceled") }
+    }
     FileDialog {                          // file dialog for read GEDCOM
         id: fileDialog
         title: "Please select Gedcom file"
@@ -340,35 +394,57 @@ EditPersonForm {
             header.length = 0
             Gedcom.parseHEADER(a)                               // parse Header data
 
-//            persons.length = 0
+            //            persons.length = 0
             Gedcom.parseINDI(a)              // parse INDI data
+            //TEST         for( i in persons){persons[i].prt()}
 
-  //          families.length = 0
+
+            //          families.length = 0
             Gedcom.parseFAM(a)                                      // parse FAM data
+            //TEST          for( i in families){families[i].prt()}
 
-//  for(var i in persons){
-//     persons[i].prt("after parseFAM")
-//  }
+            //            Gedcom.writeGedcom()
+
+
             trailer.length = 0
             Gedcom.parseTRAILER(a)                               // parse Header data
             console.log("##########################################")
 
             External.writeCSV()                                     //TODO : move to closing code
+
+            actualId = 1
+            lastId = 0
+            actualFam = 0
+            actualFamId = 0
+
+            parentFamily =null
+            partnerFamily =null
+            family= null
+            person= null
+
+            selectInit = true
+            selectCase= "person"
+            selectGender= ""
+            selectName = ""
+
+            lastfamId = 0
+
             rectOptions.visible=false
             rectPerson.visible=true
+            actualId="1"
 
             for ( var i in persons){
                 personsSort[i]= {
-                    yb: parseInt(persons[i].yearOf(persons[i].birthDate)),
-                    yd: parseInt(persons[i].yearOf(persons[i].deathDate)),
+                    yb: persons[i].birthYear(),
+                    yd: persons[i].deathYear(),
                     gn: persons[i].givenName,sn: persons[i].surName,
                     gender:persons[i].gender}
 
-     //           print(personsSort[i].yb,personsSort[i].yd,personsSort[i].gn,personsSort[i].sn,personsSort[i].gender                      )
             }
 
             //   personsSort=persons.slice() // copy of persons
-            personsSort.sort(function(a, b){return a.birthYear - b.birthYear});
+            personsSort.sort(function(a, b){return a.birthYear - b.birthYear})
+
 
         }
         onRejected: { console.log("Canceled") }

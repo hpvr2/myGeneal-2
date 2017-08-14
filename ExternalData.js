@@ -2,14 +2,14 @@
 
 function setInit(){          // set init values
     var c = {
-        path : "file:///C:/Users/hans-/OneDrive/myGeneal",
-        infile : "Bertram.ged",
+        path : "file:///C:/Users/hans-/Documents/myGeneal",
+   //     infile : "Bertram.ged",
 
-        maleColor  : "blue",
-        femaleColor : "red",
+        maleColor         : "blue",
+        femaleColor       : "red",
 
-        firstYear : 1500,
-        lastYear  : 20+ Qt.formatDateTime(new Date(), "yyMMdd").substring(0,2) ,  // actual year
+        firstYear         : 1500,
+        lastYear          : 20+ Qt.formatDateTime(new Date(), "yyMMdd").substring(0,2) ,  // actual year
 
         ageAtBirth_male   : 19, // TODO : not used  uptonow
         ageAtBirth_female : 16,
@@ -36,43 +36,25 @@ function readIni(){          // read init values ( TODO not active )
         line =a[i]
         line = line.replace(/\s\s+/g, ' ')
         token = line.split(" ")
-        for ( i=0; i<token.length;i++){print(i+"*"+token[i])}
-        //console.log(line)
         switch (token[0]){
-        case "Path"               :{
-            path = token[1];break}
-        case "Infile"             :{
-            infile = token[1]; break}
-        case "Outfile"            :{
-            outfile = token[1]; break}
+        case "Path"               : path = token[1];break
+        case "Infile"             : infile = token[1]; break
+        case "Outfile"            : outfile = token[1]; break
         // case "DebugOn"           : ........... break}
 
-        case "Malecol"            :
-            standard.maleColor = token[1]; break
-        case "Femalecol"          :
-            standard.femaleColor = token[1]; break
-        case "Firstyear"          :
-            firstYear = token[1]; break
-        case "Lastyear"           :
-            lastYear = token[1]; break
-        case "Ageatbirth_male"    :
-            ageAtBirth_male = token[1]; break
-        case "Ageatbirth_female"  :
-            ageAtBirth_female = token[1]; break
-        case "Maxage_father"      :
-            maxAge_father = token[1]; break
-        case "Maxage_mother"      :
-            maxAge_mother = token[1]; break
-        case "Maxage"             :
-            maxAge = token[1]; break
-        case "Maxdelta_childs"    :
-            maxAgeDelta_childs = token[1]; break
-        case "Maxdelta_partners"  :
-            maxAgeDelta_partners = token[1]; break
-        case "Startid"            :
-            startid = token[1]; break
-        default                   :
-            console.log("invalid value : " + line)
+        case "Malecol"            : maleColor = token[1]; break
+        case "Femalecol"          : femaleColor = token[1]; break
+        case "Firstyear"          : firstYear = token[1]; break
+        case "Lastyear"           : lastYear = token[1]; break
+        case "Ageatbirth_male"    : ageAtBirth_male = token[1]; break
+        case "Ageatbirth_female"  : ageAtBirth_female = token[1]; break
+        case "Maxage_father"      : maxAge_father = token[1]; break
+        case "Maxage_mother"      : maxAge_mother = token[1]; break
+        case "Maxage"             : maxAge = token[1]; break
+        case "Maxdelta_childs"    : maxAgeDelta_childs = token[1]; break
+        case "Maxdelta_partners"  : maxAgeDelta_partners = token[1]; break
+        case "Startid"            : startid = token[1]; break
+        default                   : console.log("invalid value : " + line)
         }
     }
 }
@@ -85,45 +67,42 @@ function writeCSV(){         // write CSV files
         text = text + ";" + person.birthDate + ";" + person.birthPlace
         text = text + ";" + person.christianDate + ";" + person.christianPlace
         text = text + ";" + person.deathDate + ";" + person.deathPlace + ";" + person.occupation
-        text = text + ";" + person.childOfFamily.pid
-        var x = ""
-        i="-1"
+        text = text + ";" + person.childOfFamily +  ";"
         for ( i in person.parentInFamily) {
-            x = x + " " + person.parentInFamily[i].pid
+            if (person.parentInFamily[i] !== ""){
+                text = text + person.parentInFamily[i]+ " "}
         }
-        text = text +  ";" + x
         text = text + ";" + person.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
-    var fileid = standard.path+"/p-autosave.csv"
-    console.log(genealFile.fileExists(fileid))
+//    console.log(genealFile.fileExists(standard.path+"/p-autosave.csv"))
 
-    var x = genealFile.writeFile(fileid,text)
+    var x = genealFile.writeFile(standard.path+"/p-autosave.csv",text)
     //###########################################
     text = ""
     for (var i in families) {
         var family = families[i]
-        text = text + family.pid + ";" + family.husband.pid + ";" +family.wife.pid + ";"
+        text = text + family.pid + ";" + family.husband + ";" +family.wife + ";"
         text = text + family.marriageDate + ";" + family.marriagePlace
-        text = text + ";" + family.divorceDate + ";" + family.divorcePlace
-        x = ""
-
+        text = text + ";" + family.divorceDate + ";" + family.divorcePlace+ ";"
+        //        print("child-list",family.children)
         for ( i in family.children) {
-            x = x + " " + persons[i].pid
+            text = text  +family.children[i] +" "
         }
-        text = text +  ";" + x
 
         text = text + ";"+ family.note.replace(/\n/g, "XNLX").replace(/;/g, "XSEMIX")+ nl
     }
-    fileid = standard.path+"/f-autosave.csv"
-    console.log(genealFile.fileExists(fileid))
+//    console.log(genealFile.fileExists(standard.path+"/f-autosave.csv"))
 
-    x = genealFile.writeFile(fileid,text)
+    x = genealFile.writeFile(standard.path+"/f-autosave.csv",text)
+
+
 }
 function readCSV_P(fileid){  // read CSV file Persons
     console.log(genealFile.fileExists(fileid))
     var text = genealFile.readFile(fileid)
     var nl = "\n"
     text  = text.split(nl)
+
     var creatorP = Qt.createComponent("Person.qml")   // define factory for person
     var person = creatorP.createObject(appWindow)
     var creatorF = Qt.createComponent("Family.qml")   // define factory for family
@@ -133,10 +112,6 @@ function readCSV_P(fileid){  // read CSV file Persons
 
 
     var family0 = creatorF.createObject(appWindow)
-    family0.pid ="0"
-    family0.husband = person0
-    family0.wife = person0
-    person0.childOfFamily = family0
 
     persons[0]=person0
 
@@ -153,6 +128,8 @@ function readCSV_P(fileid){  // read CSV file Persons
         person = creatorP.createObject(appWindow)
 
         person.pid = CSV[0]
+        if ( parseInt(person.pid) > maxid ) maxid = parseInt(person.pid)
+
         person.gender = CSV[1]
         person.givenName = CSV[2]
         person.surName  = CSV[3]
@@ -164,56 +141,40 @@ function readCSV_P(fileid){  // read CSV file Persons
         person.deathPlace  = CSV[9]
         person.occupation  = CSV[10]
         var id = CSV[11]
-
-        if (id in families) var dummy = 1 //print("family ",id,"already defined")
-        else {   // print("new family FAMC",id)
-            var family = creatorF.createObject(appWindow)
-            family.pid = id
-            families[id] = family
-        }
-        person.childOfFamily =  families[id]
+        person.childOfFamily = id
 
         x = CSV[12].split(" ")
         for ( var ii in x){
-            id =x[ii]
-            if (id in families)  dummy = 1 // print("family ",id,"already defined")
-            else {  // print("new family FAMS",id)
-                family = creatorF.createObject(appWindow)
-                family.pid = id
-                families[id] = family
-            }
-            person.parentInFamily[family.pid] = families[id]
-        }
-        person.note =  CSV[13].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
+            if (x[ii] !== "" ) person.parentInFamily.push(x[ii])   }        person.note =  CSV[13].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
         persons[person.pid]=person
     }
+    for ( var i=0; i<maxid; i++){if (!( i in persons )) unusedPersons.push(i) }
+
     for (  i in persons){
+
         personsSort[i]= {
             pid :  persons[i].pid,
-            yb: String(persons[i].yearOf(persons[i].birthDate)),
-            yd: String(persons[i].yearOf(persons[i].deathDate)),
-            gn: persons[i].givenName,sn: persons[i].surName,gender:persons[i].gender}
+            yb: persons[i].birthYearStr(),
+            yd: persons[i].deathYearStr(),
+            gn: persons[i].givenName,
+            sn: persons[i].surName,
+            gender:persons[i].gender}
     }
 
     personsSort.sort(function(a, b){return a.yb - b.yb});
-//    for (  i in personsSort){
-//    print(personsSort[i].yb,personsSort[i].yd,personsSort[i].gn,personsSort[i].sn,personsSort[i].gender)
-//}
     return
 
 }
 function readCSV_F(fileid){  // read CSV file families
     console.log(genealFile.fileExists(fileid))
     var text = genealFile.readFile(fileid)
-
     var nl = "\n"
     text  = text.split(nl)
-
     var creatorF = Qt.createComponent("Family.qml")   // define factory for person
     var family = creatorF.createObject(appWindow)
     var CSV
     var x
-
+    var maxidFam = 0
 
     for (var i in  text) {
         if (text[i].length === 0 ) break
@@ -223,30 +184,29 @@ function readCSV_F(fileid){  // read CSV file families
         family = creatorF.createObject(appWindow)
 
         family.pid = CSV[0]
-        family.husband = persons[CSV[1]]
-        family.wife = persons[CSV[2]]
+        if ( parseInt(family.pid) > maxidFam ) maxidFam = parseInt(family.pid)
+
+        family.husband = CSV[1]
+        family.wife = CSV[2]
         family.marriageDate = CSV[3]
         family.marriagePlace = CSV[4]
         family.divorceDate = CSV[5]
         family.divorcePlace = CSV[6]
         x = CSV[7].split(" ")
         for ( var ii in x){
-            var id =x[ii]
+            if ( x[ii] !== "0"){
+                 if (x[ii] !== "" ) family.children.push(x[ii])  }
 
-            family.children[family.pid] = persons[id]
         }
-
         family.note = CSV[8].replace(/XNLX/g,nl ).replace(/XSEMIX/g, ";")
         families[family.pid]=family
     }
+    for ( i=0; i<maxidFam; i++){ if ( !( i in families ))  unusedFamilies.push(i) }
+
     return
 }
-function writeHtmlP1(){      // write html index file
-    //************************************
-    for ( var i in persons){
-        var person = persons[i]
-        External.writeHtmlPers(i)
-    }
+function htmlHead1(){        // html header of index file
+
     //*************************************
     var nl = "\n"
     var text = ""
@@ -280,11 +240,24 @@ function writeHtmlP1(){      // write html index file
             "<a href='#X'><b>X</b></a> <a href='#Y'><b>Y</b></a> <a href='#Z'><b>Z</b></a> " +
             "<a href='#v'><b>v</b></a> " + nl
     text = text +"</center><hr />" + nl
-    //************************************************
-    // sort by name
-    var sortedPersons = persons.slice()
 
-    sortedPersons.sort(function(a, b) {
+    return text
+}
+function writeHtmlP1(){      // write html index file
+    //************************************
+    var nl = "\n"
+
+    for ( var i in persons){
+        var person = persons[i]
+        External.writeHtmlPers(i)
+    }
+
+    //************************************************
+    var text = htmlHead1()   // header
+    // sort by name
+    //    var sortedPersons = persons.slice()
+    personsSort.sort(function(a, b){return a.yb - b.yb});
+    personsSort.sort(function(a, b) {
         var gnameA = a.gn.toUpperCase(); // ignore upper and lowercase
         var gnameB = b.gn.toUpperCase();
         var snameA = a.sn.toUpperCase();
@@ -304,24 +277,27 @@ function writeHtmlP1(){      // write html index file
 
     var last_initial = " "
     var last_surn = " "
-    for (  i in sortedPersons){
-        person = sortedPersons[i]
-        if (person.pid <1 ) continue
-        var initial = person.surName.substr(0,1)
-        if ( person.surName.length >0 && initial >= "A" ) {
-            if ( last_initial < initial){
-                last_initial = initial
-                text = text + "<a name='"+ last_initial + "'></a><br />"
+    var initial
+    for (  i in personsSort){
+        //        print("sort",personsSort[i].pid,personsSort[i].gn,personsSort[i].sn)
+        person = personsSort[i]
+        if (person.pid !== "0" ){
+            if (person.sn.length > 0 ) initial = person.sn.substr(0,1)
+            else initial= ""
+            if ( person.sn.length >0 && initial >= "A" ) {
+                if ( last_initial < initial){
+                    last_initial = initial
+                    text = text + "<a name='"+ last_initial + "'></a><br />"
+                }
             }
-        }
-        if (last_surn !== person.surName) {
-            last_surn = person.surName
-            text = text + "<b>" + person.surName +"</b><br />"
-        }
-        text = text + "<blockquote><a href='" + person.pid +".html'> " + person.givenName + "</a>" +
-                "       " +  person.birthYear + " - " +person.deathYear+ "</blockquote>" + nl
+            if (last_surn !== person.sn) {
+                last_surn = person.sn
+                text = text + "<b>" + person.sn +"</b><br />"
+            }
+            text = text + "<blockquote><a href='" + person.pid +".html'> " + person.gn + "</a>" +
+                    "       " +   person.yb + " - " + person.yd+ "</blockquote>" + nl
 
-
+        }
     }
     //************************
     text = text + "<center><font size='-2'>Created by myGeneal <br /></font><br /></center>" + nl
@@ -343,7 +319,9 @@ function writeHtmlPers(i){   // write html person file
     var parents = null
 
     person = persons[i]
-    if ( person.pid <1 ) return
+//    person.prt("write html person :")
+    if ( person.pid === "0" ) return
+
     text = text + "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'>" + nl
     text = text + "<html>" + nl
     text = text + "<!-- *** File generated by myGeneal  *** -->" + nl
@@ -361,9 +339,6 @@ function writeHtmlPers(i){   // write html person file
     text = text + "</div></font></a></blockquote></blockquote>" + nl
     text = text + "</center> <blockquote><blockquote>" + nl
 
-
-
-
     text = text + "<a name='" + person.pid +" '> </a>" + nl
     text = text + "<h2>" + person.surName +" , " + person.givenName + "</h2>" + nl
     text = text + "<hr />" + nl
@@ -373,70 +348,87 @@ function writeHtmlPers(i){   // write html person file
     text = text + "<tr><td><b>Died        : </b></td><td>" + person.deathDate + " in : " + person.deathPlace + "</td> <br />" + nl
     text = text + "<tr><td><b>Occupation  : </b></td><td>" + person.occupation + "</td> <br /><br />" + nl
     text = text + "<table border='0'>" + nl
-    parents = families[person.childOfFamily]
-    var father = persons[parents.husband]
-    var mother = persons[parents.wife]
-    text = text + "<tr><td><b>Father  : </b></td>" +
-            "<td><a href='"  + father.pid + ".html'>" + father.surName + ", "+ father.givenName + "</td>" +
-            "<td> " + father.birthYear + " - " + father.deathYear  + nl
 
-    text = text + "<tr><td><b>Mother : </b></td>" +
-            "<td><a href='"  + mother.pid + ".html'>" + mother.surName + ", "+ mother.givenName + "</td>" +
-            "<td> " + mother.birthYear + " - " + mother.deathYear + " <br />" + nl
-    text = text + "<tr><td><br /></td></tr>" + nl
-    if ( parents.children.length > 1 ) {
-        for (var j in parents.children) {
-            if (parseInt(parents.children[j]) === 0 ) continue
-            var child = persons[parseInt(parents.children[j])]
+//    print("*"+person.childOfFamily+"*")
 
-            if (person.pid === child.pid ) continue
-
-            if ( child.gender === "M" ){ x = "Brother    : "}
-            else                       { x = "Sister     : " }
-            text = text + "<tr><td><b>" + x + "</b></td><td><a href='"  + child.pid + ".html'>" +
-                    child.surName + ", "+ child.givenName + "</td>" +
-                    "<td> " + child.birthYear + " - " + child.deathYear + " <br />" + nl
+    if (person.childOfFamily !== ""){
+        parents = families[person.childOfFamily]
+//        parents.prt("parents")
+        if (parents.husband !== ""){
+            var father = persons[parents.husband]
+//            father.prt("father")
+            text = text + "<tr><td><b>Father  : </b></td>" +
+                    "<td><a href='"  + father.pid + ".html'>" + father.surName + ", "+ father.givenName + "</td>" +
+                    "<td> " + father.birthYearStr() + " - " + father.deathYearStr() + nl
 
         }
+
+        if ( parents.wife !== "" ){
+            var mother = persons[parents.wife]
+//            mother.prt("mother")
+            text = text + "<tr><td><b>Mother : </b></td>" +
+                    "<td><a href='"  + mother.pid + ".html'>" + mother.surName + ", "+ mother.givenName + "</td>" +
+                    "<td> " + mother.birthYearStr() + " - " + mother.deathYearStr() + nl
+
+        }
+
+        text = text + "<tr><td><br /></td></tr>" + nl
+
+        for (var j in parents.children) {
+            if (parents.children[j] !== "0" & parents.children[j] !== ""){
+                var child = persons[parents.children[j]]
+//                child.prt("child")
+                if (person.pid !== child.pid ) {
+                    if ( child.gender === "M" ){ x = "Brother    : "}
+                    else                       { x = "Sister     : " }
+                    text = text + "<tr><td><b>" + x + "</b></td><td><a href='"  + child.pid + ".html'>" +
+                            child.surName + ", "+ child.givenName + "</td>" +
+                            "<td> " + child.birthYearStr() + " - " + child.deathYearStr()+ " <br />" + nl
+                }
+            }
+        }
+        //*******************************
     }
-    //*******************************
+//    print("parentin",person.parentInFamily)
+    for (j in  person.parentInFamily){
+        var xx = person.parentInFamily[j]
+//        print(j,xx)
 
-    for (j = 0 ; j < person.parentInFamily.length; j++){
-        var xx = parseInt(person.parentInFamily[j])
-        if ( isNaN(xx)) break                                       // TODO : check why, only occurs in readCSV
-        if (xx !== 0 && xx  !== ""){
-
-            if (person.parentInFamily[j] <= 0)  { print("ignoring "+ parseInt(person.parentInFamily[j])) ; continue}
-            var partnerFamily = families[parseInt(person.parentInFamily[j])]
-            if ( person.gender === "M" ){ x = "Wife    : "
-                var partner = persons[parseInt(partnerFamily.wife)]
-            }
-            else                        { x = "Husband : "
-                partner =  persons[parseInt(partnerFamily.husband)]
-            }
+        if (person.parentInFamily[j] === "0" | person.parentInFamily[j] === "")  {
+            print("ignoring "+ parseInt(person.parentInFamily[j])) ; continue}
+        var partnerFamily = families[person.parentInFamily[j]]
+//        partnerFamily.prt("")
+        if ( person.gender === "M" ){ x = "Wife    : "
+            var partnerId = partnerFamily.wife
+        }
+        else                        { x = "Husband : "
+            partnerId =  partnerFamily.husband
+        }
+//        print("partnerId",partnerId)
+        if ( partnerId !== "") {
+            var partner = persons[partnerId]
+//            partner.prt("partner")
             text = text + " <br /> <br />" + nl
             text = text + "<tr><td><b>" + x + "</b></td><td><a href='"  + partner.pid + ".html'>" +
                     partner.surName + ", "+ partner.givenName + "</td>" +
-                    "<td> " + partner.birthYear + " - " + partner.deathYear + " <br />" + nl
+                    "<td> " + partner.birthYearStr() + " - " + partner.deathYearStr() + " <br />" + nl
             text = text + " <br /> <br />" + nl
-            //********************************************
-            for (j=0; j< partnerFamily.children.length; j++){
-                if ( isNaN(parseInt(partnerFamily.children[j]))) continue
-                child = persons[parseInt(partnerFamily.children[j])]
+        }
+        //********************************************
+        for (j in partnerFamily.children){
+            if (partnerFamily.children[j] !== ""){
+                child = persons[partnerFamily.children[j]]
+//                child.prt("child")
                 if (child.gender === "M" ) x = "Son           : "
                 else                       x = "Daughter      : "
                 text = text + "<tr><td><b>" + x + "</b></td><td><a href='"  + child.pid + ".html'>" +
                         child.surName + ", "+ child.givenName + "</td>" +
-                        "<td> " + child.birthYear + " - " + child.deathYear + " <br />" + nl
-
-
+                        "<td> " + child.birthYearStr() + " - " + child.deathYearStr() + " <br />" + nl
             }
+
         }
+
     }
-
-
-
-
 
     text = text + "</table>" + nl
     text = text + "<br /><hr />" + nl
@@ -448,7 +440,12 @@ function writeHtmlPers(i){   // write html person file
 
 
     var fileid = standard.path + "/Html/" + person.pid +".html"
-    console.log(genealFile.fileExists(fileid))
+//    console.log(genealFile.fileExists(fileid))
 
     x = genealFile.writeFile(fileid,text)
+
+
+
+
 }
+

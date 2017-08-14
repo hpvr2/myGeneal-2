@@ -52,23 +52,15 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
     var person = creatorP.createObject(appWindow)     // actual person
     var person0 = creatorP.createObject(appWindow)     // empty person
     person0.pid= "0"
-
-    var family0 = creatorF.createObject(appWindow)
-    family0.pid ="0"
-    family0.husband = person0
-    family0.wife = person0
-    person0.childOfFamily = family0
-    person.childOfFamily = family0
     persons[0]=person0
 
-
-    var i = 0
     var nl = "\n"
     var dateFlag = "none"
     var tempDate = ""
-    var tempYear = ""
     var line
     var token = []
+
+
     for ( var i1 = startIndi ; i1< a.length; i1++)  {     //  Read person Records
 
         line =a[i1].trim()
@@ -80,6 +72,8 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
             // cleanup person note : splitNote(person.note)
 
             persons[person.pid] = person       // store last person
+            if ( parseInt(person.pid) > maxid ) maxid = parseInt(person.pid)
+
             break
         }
         else {
@@ -89,92 +83,53 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
                 persons[person.pid] = person                    // store last person
                 person = creatorP.createObject(appWindow) // new person
                 person.pid = xx                           // use temp stored id
-                person.childOfFamily = family0
+                if ( parseInt(xx) > maxid ) maxid = parseInt(xx)
+
                 break
             }
             // ****************************************************************************************
             default : {
                 switch(token[1]){
-                case "GIVN" :
-                    person.givenName  = line.substr(line.indexOf("GIVN")+5) ;
-                    break
-                case "SURN" :
-                    person.surName    = line.substr(line.indexOf("SURN")+5) ;
-                    break
-                case "SEX"  :
-                    person.gender     = line.substr(line.indexOf("SEX")+4)  ;
-                    break
-                case "OCCU" :
-                    person.occupation = line.substr(line.indexOf("OCCU")+5) ;
-                    break
-                case "NOTE" :
-                    person.note = line.substr(line.indexOf(token[1])+5);
-                    break
-                case "CONC" :
-                    person.note = person.note + line.substr(line.indexOf(token[1])+5);
-                    break
+                case "GIVN" : person.givenName  = line.substr(line.indexOf("GIVN")+5) ; break
+                case "SURN" : person.surName    = line.substr(line.indexOf("SURN")+5) ; break
+                case "SEX"  : person.gender     = line.substr(line.indexOf("SEX")+4)  ; break
+                case "OCCU" : person.occupation = line.substr(line.indexOf("OCCU")+5) ; break
+                case "NOTE" : person.note       = line.substr(line.indexOf("NOTE")+5) ; break
+                case "CONC" : person.note  = person.note + line.substr(line.indexOf("CONC")+5); break
                 case "CONT" :
-                    if (line.substr(line.indexOf("CONT")+5).length > 0){person.note = person.note + nl+ line.substr(line.indexOf("CONT")+5) }
+                    if (line.substr(line.indexOf("CONT")+5).length > 0){
+                        person.note = person.note + nl+ line.substr(line.indexOf("CONT")+5) }
                     break
 
                 case "FAMC" :
                     var id =token[2].match(/\d+/g)[0]
-                    if (id in families) var dummy = 1 //print("family ",id,"already defined")
-                    else {   // print("new family FAMC",id)
-                        var family = creatorF.createObject(appWindow)
-                        family.pid = id
-                        families[id] = family
-                    }
-                    person.childOfFamily =  families[id]
+                    person.childOfFamily =  id
                     break
                 case "FAMS" :
                     id =token[2].match(/\d+/g)[0]
-                    if (id in families)  dummy = 1 // print("family ",id,"already defined")
-                    else {  // print("new family FAMS",id)
-                        family = creatorF.createObject(appWindow)
-                        family.pid = id
-                        families[id] = family
-                    }
-                    person.parentInFamily[family.pid] = families[id]
+                    person.parentInFamily.push(id)
                     break  //TODO
 
-                case "BIRT" :
-                    dateFlag = "birth"     ;
-                    break
-                case "DEAT" :
-                    dateFlag = "death"     ;
-                    break
-                case "CHR"  :
-                    dateFlag = "christian" ;
-                    break
+                case "BIRT" : dateFlag = "birth"     ; break
+                case "DEAT" : dateFlag = "death"     ; break
+                case "CHR"  : dateFlag = "christian" ; break
 
                 case "DATE" :                          // todo : add suport for sorted date
                     tempDate = line.substr(line.indexOf("DATE")+5)
                     switch(dateFlag ){
-                    case "birth" :
-                        person.birthDate = tempDate
-                        break
-                    case "christian" :
-                        person.christianDate = tempDate
-                        break
-                    case "death" :
-                        person.deathDate = tempDate
-                        break
+                    case "birth"     : person.birthDate     = tempDate ; break
+                    case "christian" : person.christianDate = tempDate ; break
+                    case "death"     : person.deathDate     = tempDate ; break
                     default : console.log("unkown dateFlag : "+dateFlag)
                     }
                     break
 
                 case "PLAC" :
+                    var xplace = line.substr(line.indexOf("PLAC")+5)
                     switch(dateFlag ){
-                    case "birth" :
-                        person.birthPlace = line.substr(line.indexOf("PLAC")+5)
-                        break
-                    case "christian" :
-                        person.christianPlace = line.substr(line.indexOf("PLAC")+5) ;
-                        break
-                    case "death" :
-                        person.deathPlace = line.substr(line.indexOf("PLAC")+5) ;
-                        break
+                    case "birth"     : person.birthPlace     = xplace ; break
+                    case "christian" : person.christianPlace = xplace ; break
+                    case "death"     : person.deathPlace     = xplace ; break
                     default :
                         console.log("unkown dateFlag : "+dateFlag)
                     }
@@ -191,17 +146,13 @@ function parseINDI(a){             // Extract Person data from GEDCOM array "a"
         }
 
     }
+    for ( var i=0; i<maxid; i++){if (!( i in persons )) unusedPersons.push(i) }
 }
 function parseFAM(a){              // Extract family data from GEDCOM array "a"
 
     var creatorF = Qt.createComponent("Family.qml")   // define factory for family
     var family = creatorF.createObject(appWindow)     // actual family
     var family0 = creatorF.createObject(appWindow)     // actual family
-    family0.pid = "0"                        // use temp stored id
-    family0.husband = persons[0]
-    family0.wife = persons[0]
-    family.husband = persons[0]
-    family.wife = persons[0]
 
     var dateFlag = "none"
     var nl ="\n"
@@ -214,7 +165,7 @@ function parseFAM(a){              // Extract family data from GEDCOM array "a"
 
         if ( token[1] === "TRLR" || token[2] === "SOUR" ){   //end of FAM part
             families[family.pid] =family            // store last family
-            print("in db",families[family.pid].pid,families[family.pid].husband.pid)
+            if ( parseInt(family.pid) > maxidFam ) maxidFam = parseInt(family.pid)
 
             startTrailer = i1
 
@@ -227,61 +178,39 @@ function parseFAM(a){              // Extract family data from GEDCOM array "a"
                 families[family.pid] =family            // store last family
                 family = creatorF.createObject(appWindow) // new person
                 family.pid = xx                           // use temp stored id
-                family.husband = persons[0]
-                family.wife = persons[0]
+                if ( parseInt(xx) > maxidFam ) maxidFam = parseInt(xx)
+
                 break
 
             default :
 
                 switch(token[1]){
+                case "HUSB" : family.husband      = token[2].match(/\d+/g)[0] ; break
+                case "WIFE" : family.wife         = token[2].match(/\d+/g)[0] ; break
+                case "CHIL" : family.children.push(token[2].match(/\d+/g)[0]) ; break
+                case "MARR" : dateFlag = "marriage" ;   break
+                case "DIV"  : dateFlag = "divorce"  ;   break
 
-                case "HUSB" :
-                    var id = token[2].match(/\d+/g)[0]
-                    family.husband = persons[id]
-                    break
-                case "WIFE" :
-                    id =  token[2].match(/\d+/g)[0]
-                    family.wife = persons[id]
-                    break
-                case "CHIL"  :
-                    id = token[2].match(/\d+/g)[0]
-                    family.children[id] = persons[id]
-                    break
-                case "MARR" :
-                    dateFlag = "marriage" ;
-                    break
-                case "DIV" : dateFlag = "divorce"
-                    break
-
-                case "NOTE" :
-                    family.note = line.substr(line.indexOf(token[1])+5);
-                    break
-                case "CONC" :
-                    family.note = family.note + line.substr(line.indexOf(token[1])+5);
-                    break
+                case "NOTE" : family.note = line.substr(line.indexOf(token[1])+5); break
+                case "CONC" : family.note = family.note + line.substr(line.indexOf(token[1])+5); break
                 case "CONT" :
-                    if (line.substr(line.indexOf("CONT")+5).length > 0){ family.note = family.note + nl+ line.substr(line.indexOf("CONT")+5)}
+                    if (line.substr(line.indexOf("CONT")+5).length > 0){
+                        family.note = family.note + nl+ line.substr(line.indexOf("CONT")+5)}
                     break
                 case "DATE" :                              // todo : add suport for sorted date
+                    var xdate = line.substr(line.indexOf("DATE")+5)
                     switch(dateFlag ){
-                    case "marriage" :
-                        family.marriageDate = line.substr(line.indexOf("DATE")+5) ;
-                        break
-                    case "divorce" :
-                        family.divorceDate = line.substr(line.indexOf("DATE")+5) ;
-                        break
+                    case "marriage" : family.marriageDate = xdate ; break
+                    case "divorce"  : family.divorceDate  = xdate ; break
                     default :
                         console.log("unkown dateFlag : "+dateFlag)
                     }
                     break
                 case "PLAC" :
+                    var xplace = line.substr(line.indexOf("PLAC")+5)
                     switch(dateFlag ){
-                    case "marriage" :
-                        family.marriagePlace = line.substr(line.indexOf("PLAC")+5) ;
-                        break
-                    case "divorce" :
-                        family.divorcePlace = line.substr(line.indexOf("PLAC")+5) ;
-                        break
+                    case "marriage" : family.marriagePlace = xplace ; break
+                    case "divorce"  : family.divorcePlace  = xplace ; break
                     default :
                         console.log("unkown dateFlag : "+dateFlag)
                     }
@@ -292,6 +221,8 @@ function parseFAM(a){              // Extract family data from GEDCOM array "a"
             }
         }
     }
+    for ( var i=0; i<maxidFam; i++){ if ( !( i in families ))  unusedFamilies.push(i) }
+
 }
 function writeNote(note){          // write a note in gedcom format
     var cmd = "1 NOTE "
@@ -320,24 +251,17 @@ function writeNote(note){          // write a note in gedcom format
     return text
 }
 function writeGedcom(){            // write GEDCOM file
-
-    var path = standard.path + "/Data/testOutput.ged"
     var i = 0
     var text
     var nl = "\n"
 
-    text = "0 HEAD" + nl                                           // TODO : replace with stored text
-    text = text +"1 SOUR myGeneal" + nl
-    text = text +"2 VERS 0.1" + nl
-    text = text +"0 @U1@ SUBM" + nl
-    text = text +"1 NAME Hans-Peter von Reth" + nl
-    text = text +"0 @SUBM@ SUBM" + nl
-    text = text +"1 NAME Hans-Peter von Reth" + nl
+    text = textEditHeader.text
     //    ######################
     for (var i1 in persons){                                    // write INDI part
+
         person = persons[i1]
-        //     person.prt()
-        if (person.pid >= 1){
+        //        person.prt()
+        if ( i1 >0){
             text = text +"0 @I" + person.pid + "@ INDI" + nl
             text = text +"1 NAME " +person.givenName + "/" + person.surName + "/" + nl
             text = text +"2 GIVN " + person.givenName + nl
@@ -357,10 +281,10 @@ function writeGedcom(){            // write GEDCOM file
                 text = text +"2 DATE " + person.deathDate  +nl
                 if ( person.deathPlace != "" ){ text = text +"2 PLAC " + person.deathPlace + nl}
             }
-            for ( var i2 in person.parentInFamily){
-                if (i2  !== 0){ text = text +"1 FAMS @F" + person.parentInFamily[i2] + "@" + nl}
-            }
-            if (person.childOfFamily != 0){
+            for (var ii= 0; ii<person.parentInFamily.length;ii++){
+                text = text +"1 FAMS @F" + person.parentInFamily[ii] + "@" + nl}
+
+            if (person.childOfFamily !== ""){
                 text = text +"1 FAMC @F" + person.childOfFamily + "@" + nl
             }
             if ( person.occupation != "" ){ text = text +"1 OCCU " + person.occupation + nl
@@ -372,39 +296,32 @@ function writeGedcom(){            // write GEDCOM file
     }
     //    ######################
     for ( i1 in families){                                      // write FAM part
-        var family = families[i1]
-        if ( family.pid     >= 1)  { text = text + "0 @F" + family.pid + "@ FAM" + nl     }
-        if (family.husband !== 0 ){ text = text + "1 HUSB @I" + family.husband + "@" + nl }
-        if (family.wife    !== 0 ){ text = text + "1 WIFE @I" + family.wife    + "@" + nl }
-        if (family.marriageDate !== "" ){
-            text = text + "1 MARR" + nl
-            if (family.marriageDate  !== "" ){ text = text + "2 DATE " + family.marriageDate  + nl }
-            if (family.marriagePlace !== "" ){ text = text + "2 PLAC " + family.marriagePlace  + nl }
+        if ( i1 > 0 ){
+            var family = families[i1]
+            text = text + "0 @F" + family.pid + "@ FAM" + nl
+            if (family.husband !== "" ){ text = text + "1 HUSB @I" + family.husband + "@" + nl }
+            if (family.wife    !== ""){ text = text + "1 WIFE @I" + family.wife    + "@" + nl }
+            if (family.marriageDate !== "" ){
+                text = text + "1 MARR" + nl
+                if (family.marriageDate  !== "" ){ text = text + "2 DATE " + family.marriageDate  + nl }
+                if (family.marriagePlace !== "" ){ text = text + "2 PLAC " + family.marriagePlace  + nl }
+            }
+            if (family.divorceDate !== "" ){
+                text = text + "1 DIV" + nl
+                if (family.divorceDate  !== "" ){ text = text + "2 DATE " + family.divorceDate  + nl }
+                if (family.divorcePlace !== "" ){ text = text + "2 PLAC " + family.divorcePlace  + nl }
+            }
+            for ( ii=0; ii<family.children.length;ii++){
+                text = text +"1 CHIL @I" + family.children[ii] + "@" + nl
+            }
+            if ( family.note !== "" ){  text = text + writeNote(String(family.note).trim()) }
         }
-        if (family.divorceDate !== "" ){
-            text = text + "1 DIV" + nl
-            if (family.divorceDate  !== "" ){ text = text + "2 DATE " + family.divorceDate  + nl }
-            if (family.divorcePlace !== "" ){ text = text + "2 PLAC " + family.divorcePlace  + nl }
-        }
-        for (  i2 in family.children){
-            if (i2  !== 0){ text = text +"1 CHIL @I" + family.children[i2] + "@" + nl}
-        }
-        if ( family.note !== "" ){  text = text + writeNote(String(family.note).trim()) }
+
+
     }
     //    ######################
-    text = text + '0 @S4@ SOUR\n'                               // TODO : replace with stored text
-    text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
-    text = text + '0 @S6@ SOUR\n'
-    text = text + '1 TITL Euregio\n'
-    text = text + '1 REPO @R1@\n'
-    text = text + '0 @S20@ SOUR\n'
-    text = text + '1 TITL (see notes)\n'
-    text = text + '0 @S37@ SOUR\n'
-    text = text + '1 TITL LDS Microfilm, Rohrbronn\n'
-    text = text + '0 @R1@ REPO\n'
-    text = text + '1 NAME Euregio Familienbuch\n'
-    text = text + '0 TRLR\n'
-    var fileid = standard.path + "/all-test.ged"
+    text = text + textEditTrailer.text
+    var fileid = standard.path + "/output.ged"
     console.log(genealFile.fileExists(fileid))
 
     var x = genealFile.writeFile(fileid,text)

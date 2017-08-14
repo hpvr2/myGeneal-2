@@ -40,10 +40,14 @@ DISTFILES += \
     Data/f-autosave.csv \
     Data/p-autosave.csv \
     Data/myGeneal.ini \
-    ../../QML-Geneal/myGeneal-2/Data/Bertram.ged \
     ../../QML-Geneal/myGeneal-2/Data/f-autosave.csv \
     ../../QML-Geneal/myGeneal-2/Data/p-autosave.csv \
-    ../../QML-Geneal/myGeneal-2/Data/myGeneal.ini \
     ../../QML-Geneal/myGeneal-2/Data/all-out.ged \
-    ../../QML-Geneal/myGeneal-2/Data/All.ged \
-    ../../QML-Geneal/myGeneal-2/Data/all-test.ged
+    ../../../OneDrive/Bilder-OneDrive/Eigene Aufnahmen/Hannah.jpg \
+    ../../QML-Geneal/myGeneal-2/Data/Hannah.jpg \
+    ../../myGeneal/Data/all-test.ged \
+    ../../myGeneal/Data/All.ged \
+    ../../myGeneal/Data/Bertram.ged \
+    ../../myGeneal/Data/header-data.ged \
+    ../../myGeneal/Data/trailer-data.ged \
+    ../../myGeneal/Data/myGeneal.ini
